@@ -6,8 +6,8 @@ By default, it draws all active instances on top of each other using a transpare
 
 ![All instances are shown live.](ShowInterpolations.png "Show Interpolations Screenshot")
 
-After installation, it will add the menu item *View > Show Interpolations* (Cmd-J).
-You can set a different keyboard shortcut in System Preferences.
+After installation, it will add the menu item *View > Show Interpolations*.
+You can set a keyboard shortcut in System Preferences.
 
 ### Installation
 
@@ -18,7 +18,7 @@ You can set a different keyboard shortcut in System Preferences.
 ### Usage Instructions
 
 1. Open a glyph in Edit View.
-2. Use *View > Show Interpolations* (Cmd-J) to toggle the preview of the instances.
+2. Use *View > Show Interpolations* to toggle the preview of the instances.
 
 ### Custom Parameter
 

@@ -13,6 +13,7 @@ if not path in sys.path:
 
 import GlyphsApp
 
+ServiceProvider = NSClassFromString("GSServiceProvider").alloc().init()
 GlyphsReporterProtocol = objc.protocolNamed( "GlyphsReporter" )
 
 class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
@@ -23,6 +24,8 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		"""
 		try:
 			#Bundle = NSBundle.bundleForClass_( NSClassFromString( self.className() ));
+			
+			
 			return self
 		except Exception as e:
 			self.logToConsole( "init: %s" % str(e) )
@@ -54,7 +57,7 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		If you are not sure, use 'return None'. Users can set their own shortcuts in System Prefs.
 		"""
 		try:
-			return "j"
+			return None
 		except Exception as e:
 			self.logToConsole( "keyEquivalent: %s" % str(e) )
 	
@@ -67,7 +70,7 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		... if you do not want to set a shortcut.
 		"""
 		try:
-			return NSShiftKeyMask | NSCommandKeyMask
+			return 0
 		except Exception as e:
 			self.logToConsole( "modifierMask: %s" % str(e) )
 	
@@ -78,6 +81,7 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		try:
 			thisInterpolation = thisInstance.instanceInterpolations()
 			interpolatedLayer = thisGlyph.decomposedInterpolate_( thisInterpolation )
+			interpolatedLayer.roundCoordinates()
 			if len( interpolatedLayer.paths ) != 0:
 				return interpolatedLayer
 			else:
@@ -145,27 +149,32 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		Whatever you draw here will be displayed BEHIND the paths.
 		"""
 		try:
-			Glyph = Layer.parent
-			Font = Glyph.parent
-			Instances = [ i for i in Font.instances if i.active ]
+			if False: #change to False if you want to activate
+				pass
+			else:
+				Glyph = Layer.parent
+				Font = Glyph.parent
+				Instances = [ i for i in Font.instances if i.active ]
 			
-			if len( Instances ) > 0:
-				displayedInterpolationCount = 0
-				for thisInstance in Instances:
-					showInterpolationValue = thisInstance.customParameters["ShowInterpolation"]
-					interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
-					if showInterpolationValue is not None:
-						displayedInterpolationCount += 1
-						if interpolatedLayer is not None:
-							self.colorForParameterValue( showInterpolationValue ).set()
-							interpolatedLayer.bezierPath().fill()
-				if displayedInterpolationCount == 0:
-					self.colorForParameterValue( None ).set()
+				if len( Instances ) > 0:
+					# display all instances that have a custom parameter:
+					displayedInterpolationCount = 0
 					for thisInstance in Instances:
-						interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
-						if interpolatedLayer is not None:
-							interpolatedLayer.bezierPath().fill()
-						
+						showInterpolationValue = thisInstance.customParameters["ShowInterpolation"]
+						if showInterpolationValue is not None:
+							interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
+							displayedInterpolationCount += 1
+							if interpolatedLayer is not None:
+								self.colorForParameterValue( showInterpolationValue ).set()
+								interpolatedLayer.bezierPath().fill()
+					
+					# if no custom parameter is set, display them all:
+					if displayedInterpolationCount == 0:
+						self.colorForParameterValue( None ).set()
+						for thisInstance in Instances:
+							interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
+							if interpolatedLayer is not None:
+								interpolatedLayer.bezierPath().fill()
 		except Exception as e:
 			self.logToConsole( "drawBackgroundForLayer_: %s" % str(e) )
 	
@@ -174,7 +183,31 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		Whatever you draw here will be displayed behind the paths, but for inactive masters.
 		"""
 		try:
-			pass
+			if True: #change to False if you want to activate
+				pass
+			else:
+				Glyph = Layer.parent
+				Font = Glyph.parent
+				Instances = [ i for i in Font.instances if i.active ]
+			
+				if len( Instances ) > 0:
+					displayedInterpolationCount = 0
+					for thisInstance in Instances:
+						showInterpolationValue = thisInstance.customParameters["ShowInterpolation"]
+						interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
+						if showInterpolationValue is not None:
+							displayedInterpolationCount += 1
+							if interpolatedLayer is not None:
+								self.colorForParameterValue( showInterpolationValue ).set()
+								interpolatedLayer.roundCoordinates()
+								interpolatedLayer.bezierPath().fill()
+					if displayedInterpolationCount == 0:
+						self.colorForParameterValue( None ).set()
+						for thisInstance in Instances:
+							interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
+							interpolatedLayer.roundCoordinates()
+							if interpolatedLayer is not None:
+								interpolatedLayer.bezierPath().fill()
 		except Exception as e:
 			self.logToConsole( str(e) )
 	
@@ -184,6 +217,22 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		"""
 		return False
 	
+	def getDisplayString( self ):
+		listOfGlyphNames = []
+		myTextPieces = self.controller.activeEditViewController().graphicView().displayString().replace("\n"," ").split(" ")
+		
+		for thisPiece in myTextPieces:
+			if thisPiece.startswith("/"):
+				for thisName in thisPiece.split("/"):
+					listOfGlyphNames.append(thisName)
+			elif thisPiece == "":
+				if listOfGlyphNames[-1] != "space":
+					listOfGlyphNames.append("space")
+			else:
+				for thisLetter in thisPiece:
+					glyphName = ServiceProvider.nameStringFromUnicodeString_(thisLetter)[1:]
+					listOfGlyphNames.append( glyphName )
+					
 	def getScale( self ):
 		"""
 		self.getScale() returns the current scale factor of the Edit View UI.
