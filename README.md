@@ -8,8 +8,6 @@ By default, it draws all active instances on top of each other using a transpare
 
 After installation, it will add the menu item *View > Show Interpolations*.
 You can set a keyboard shortcut in System Preferences.
-After installation, it will add the menu item *View > Show Interpolations* (Cmd-Shift-J).
-You can set a different keyboard shortcut in System Preferences.
 
 ### Installation
 
