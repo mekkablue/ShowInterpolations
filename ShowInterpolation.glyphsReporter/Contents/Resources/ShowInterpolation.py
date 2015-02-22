@@ -79,7 +79,12 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		Yields a layer.
 		"""
 		try:
-			thisInterpolation = thisInstance.instanceInterpolations()
+			try:
+				# Glyphs 2.x syntax:
+				thisInterpolation = thisInstance.instanceInterpolations
+			except:
+				# Glyphs 1.x syntax:
+				thisInterpolation = thisInstance.instanceInterpolations()
 			interpolatedLayer = thisGlyph.decomposedInterpolate_( thisInterpolation )
 			interpolatedLayer.roundCoordinates()
 			if len( interpolatedLayer.paths ) != 0:
@@ -213,9 +218,14 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 	
 	def needsExtraMainOutlineDrawingForInactiveLayer_( self, Layer ):
 		"""
-		return False to disable the black outline. Otherwise remove the method.
+		Whatever you draw here will be displayed in the Preview at the bottom.
+		Remove the method or return True if you want to leave the Preview untouched.
+		Return True to leave the Preview as it is and draw on top of it.
+		Return False to disable the Preview and draw your own.
+		In that case, don't forget to add Bezier methods like in drawForegroundForLayer_(),
+		otherwise users will get an empty Preview.
 		"""
-		return False
+		return True
 	
 	def getDisplayString( self ):
 		listOfGlyphNames = []

@@ -16,12 +16,18 @@
 	<string>ShowInterpolation</string>
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>1.0.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.2</string>
+	<string>4</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.3</string>
+	<key>UpdateFeedURL</key>
+	<string>https://raw.githubusercontent.com/mekkablue/ShowInterpolation/master/ShowInterpolation.glyphsReporter/Contents/Info.plist</string>
+	<key>productPageURL</key>
+	<string>https://github.com/mekkablue/ShowInterpolation</string>
+	<key>productReleaseNotes</key>
+	<string>Fixed display in the Preview.</string>
 	<key>LSHasLocalizedDisplayName</key>
 	<false/>
 	<key>NSAppleScriptEnabled</key>
