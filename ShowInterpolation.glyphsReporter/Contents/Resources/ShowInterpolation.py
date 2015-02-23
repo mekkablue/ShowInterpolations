@@ -80,11 +80,11 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		"""
 		try:
 			try:
-				# Glyphs 2.x syntax:
-				thisInterpolation = thisInstance.instanceInterpolations
-			except:
 				# Glyphs 1.x syntax:
 				thisInterpolation = thisInstance.instanceInterpolations()
+			except:
+				# Glyphs 2.x syntax:
+				thisInterpolation = thisInstance.instanceInterpolations
 			interpolatedLayer = thisGlyph.decomposedInterpolate_( thisInterpolation )
 			interpolatedLayer.roundCoordinates()
 			if len( interpolatedLayer.paths ) != 0:
