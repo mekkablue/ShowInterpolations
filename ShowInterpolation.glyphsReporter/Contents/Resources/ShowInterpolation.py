@@ -79,14 +79,16 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		Yields a layer.
 		"""
 		try:
-			try:
-				# Glyphs 1.x syntax:
-				thisInterpolation = thisInstance.instanceInterpolations()
-			except:
-				# Glyphs 2.x syntax:
-				thisInterpolation = thisInstance.instanceInterpolations
-			interpolatedLayer = thisGlyph.decomposedInterpolate_( thisInterpolation )
-			interpolatedLayer.roundCoordinates()
+			# try:
+			# 	# Glyphs 1.x syntax:
+			# 	thisInterpolation = thisInstance.instanceInterpolations()
+			# except:
+			# 	# Glyphs 2.x syntax:
+			# 	thisInterpolation = thisInstance.instanceInterpolations
+			interpolatedLayer = thisGlyph.decomposedInterpolate_( thisInstance )
+			thisFont = thisGlyph.parent
+			if not thisInstance.customParameters["Grid Spacing"] and not ( thisFont.gridMain() / thisFont.gridSubDivision() ):
+				interpolatedLayer.roundCoordinates()
 			if len( interpolatedLayer.paths ) != 0:
 				return interpolatedLayer
 			else:
@@ -188,31 +190,7 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		Whatever you draw here will be displayed behind the paths, but for inactive masters.
 		"""
 		try:
-			if True: #change to False if you want to activate
-				pass
-			else:
-				Glyph = Layer.parent
-				Font = Glyph.parent
-				Instances = [ i for i in Font.instances if i.active ]
-			
-				if len( Instances ) > 0:
-					displayedInterpolationCount = 0
-					for thisInstance in Instances:
-						showInterpolationValue = thisInstance.customParameters["ShowInterpolation"]
-						interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
-						if showInterpolationValue is not None:
-							displayedInterpolationCount += 1
-							if interpolatedLayer is not None:
-								self.colorForParameterValue( showInterpolationValue ).set()
-								interpolatedLayer.roundCoordinates()
-								interpolatedLayer.bezierPath().fill()
-					if displayedInterpolationCount == 0:
-						self.colorForParameterValue( None ).set()
-						for thisInstance in Instances:
-							interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
-							interpolatedLayer.roundCoordinates()
-							if interpolatedLayer is not None:
-								interpolatedLayer.bezierPath().fill()
+			pass
 		except Exception as e:
 			self.logToConsole( str(e) )
 	
@@ -226,22 +204,6 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 		otherwise users will get an empty Preview.
 		"""
 		return True
-	
-	def getDisplayString( self ):
-		listOfGlyphNames = []
-		myTextPieces = self.controller.activeEditViewController().graphicView().displayString().replace("\n"," ").split(" ")
-		
-		for thisPiece in myTextPieces:
-			if thisPiece.startswith("/"):
-				for thisName in thisPiece.split("/"):
-					listOfGlyphNames.append(thisName)
-			elif thisPiece == "":
-				if listOfGlyphNames[-1] != "space":
-					listOfGlyphNames.append("space")
-			else:
-				for thisLetter in thisPiece:
-					glyphName = ServiceProvider.nameStringFromUnicodeString_(thisLetter)[1:]
-					listOfGlyphNames.append( glyphName )
 					
 	def getScale( self ):
 		"""

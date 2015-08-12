@@ -33,7 +33,7 @@ The Value defines the color of the instance. You can either leave the value blan
 
 ### Requirements
 
-The plugin needs Glyphs 1.4.3 or higher, running on OS X 10.7 or later. I can only test it in current OS versions, and I assume it will not work in versions of Mac OS X older than 10.7.
+The plugin needs Glyphs 2.x or higher, running on OS X 10.9.5 or later.
 
 ### License
 
