@@ -2,8 +2,7 @@
 # encoding: utf-8
 
 import objc
-from Foundation import *
-from AppKit import *
+from Foundation import NSBundle, NSClassFromString, NSObject, NSLog, NSColor
 import sys, os, re
 
 MainBundle = NSBundle.mainBundle()
