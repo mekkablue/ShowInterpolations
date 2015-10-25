@@ -19,15 +19,15 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>9</string>
+	<string>10</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.8</string>
+	<string>1.0.9</string>
 	<key>UpdateFeedURL</key>
 	<string>https://raw.githubusercontent.com/mekkablue/ShowInterpolations/master/ShowInterpolation.glyphsReporter/Contents/Info.plist</string>
 	<key>productPageURL</key>
 	<string>https://github.com/mekkablue/ShowInterpolation</string>
 	<key>productReleaseNotes</key>
-	<string>Fixed display of corner components; dropped Glyphs 1.x compatibility.</string>
+	<string>Code cleanup, improved performance.</string>
 	<key>LSHasLocalizedDisplayName</key>
 	<false/>
 	<key>NSAppleScriptEnabled</key>
