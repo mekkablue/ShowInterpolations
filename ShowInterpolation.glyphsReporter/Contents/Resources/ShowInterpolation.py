@@ -84,7 +84,10 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 			# except:
 			# 	# Glyphs 2.x syntax:
 			# 	thisInterpolation = thisInstance.instanceInterpolations
-			interpolatedLayer = thisGlyph.decomposedInterpolate_( thisInstance )
+			interpolatedFont = thisInstance.pyobjc_instanceMethods.interpolatedFont()
+			print "interpolatedFont", interpolatedFont
+			interGlyphs = interpolatedFont.glyphForName_(thisGlyph.name)
+			interpolatedLayer = interGlyphs.layerForKey_(interpolatedFont.fontMasterID())
 			thisFont = thisGlyph.parent
 			if not thisInstance.customParameters["Grid Spacing"] and not ( thisFont.gridMain() / thisFont.gridSubDivision() ):
 				interpolatedLayer.roundCoordinates()
@@ -93,7 +96,8 @@ class ShowInterpolation ( NSObject, GlyphsReporterProtocol ):
 			else:
 				return None
 		except Exception as e:
-			self.logToConsole( "glyphInterpolation: %s" % str(e) )
+			import traceback
+			print traceback.format_exc()
 			return None
 	
 	def colorForParameterValue( self, parameterString ):
