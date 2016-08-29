@@ -26,7 +26,7 @@ To center the interpolations under the frontmost layer, Ctrl- or right-click any
 
 ![Toggle the centering of interpolations via the context menu](ShowInterpolationsContextMenu.png "Show Interpolations Context Menu")
 
-To toggle the setting back, open the context menu again, and choose *Do Not Center Interpolations* (de: *Interpolationen nicht zentrieren*, es: *No centrar las interpolaciones*, fr: *Ne pas centrer les interpolations*).
+To toggle the setting back, open the context menu again, and choose *Do Not Center Interpolations* (de: *Interpolationen nicht zentrieren*, es: *No centrar las interpolaciones*, fr: *Ne pas centrer les interpolations*). You may have to pan or zoom a little to force an update of the drawings.
 
 ### Custom Parameter
 
