@@ -6,19 +6,27 @@ By default, it draws all active instances on top of each other using a transpare
 
 ![All instances are shown live.](ShowInterpolations.png "Show Interpolations Screenshot")
 
-After installation, it will add the menu item *View > Show Interpolations*.
+After installation, it will add the menu item *View > Show Interpolations* (de: *Interpolationen zeigen*, fr: *Montrer Interpolations*, es: *Mostrar Interpolaciones*).
 You can set a keyboard shortcut in System Preferences.
 
 ### Installation
 
+Please install the plugin via the built-in Plugin Manager, available via *Window > Plugin Manager*. If this is not possible for some reason or another, follow these steps:
+
 1. Download the complete ZIP file and unpack it, or clone the repository.
-2. Double click the .glyphsReporter file. Confirm the dialog that appears in Glyphs.
+2. Double click the `.glyphsReporter` file. Confirm the dialog that appears in Glyphs.
 3. Restart Glyphs
 
 ### Usage Instructions
 
 1. Open a glyph in Edit View.
 2. Use *View > Show Interpolations* to toggle the preview of the instances.
+
+To center the interpolations under the frontmost layer, Ctrl- or right-click anywhere in the canvas to invoke the context menu, and choose *Center Interpolations* (de: *Interpolationen zentrieren*, fr: *Centrer interpolations*, es: *Centrar interpolaciones*). 
+
+![Toggle the centering of interpolations via the context menu](ShowInterpolationsContextMenu.png "Show Interpolations Context Menu")
+
+To toggle the setting back, open the context menu again, and choose *Do Not Center Interpolations* (de: *Interpolationen nicht zentrieren*, es: *No centrar las interpolaciones*, fr: *Ne pas centrer les interpolations*).
 
 ### Custom Parameter
 
