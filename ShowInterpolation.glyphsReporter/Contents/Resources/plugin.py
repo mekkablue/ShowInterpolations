@@ -184,4 +184,5 @@ class ShowInterpolation(ReporterPlugin):
 
 	def toggleCentering(self):
 		Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"] = not Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"]
+		Glyphs.update()
 		
