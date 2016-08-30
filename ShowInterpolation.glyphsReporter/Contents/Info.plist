@@ -17,15 +17,15 @@
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleVersion</key>
-	<string>13</string>
+	<string>14</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0.1</string>
+	<string>2.0.2</string>
 	<key>UpdateFeedURL</key>
 	<string>https://raw.githubusercontent.com/mekkablue/ShowInterpolations/master/ShowInterpolation.glyphsReporter/Contents/Info.plist</string>
 	<key>productPageURL</key>
 	<string>https://github.com/mekkablue/ShowInterpolations</string>
 	<key>productReleaseNotes</key>
-	<string>New code base, now include context menu toggle for centering the interpolations.</string>
+	<string>Added Alignment at certain nodes (see context menu, thx Pablo Impallari).</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright, Rainer Erich Scheichelbauer, 2014-2016</string>
 	<key>NSMainNibFile</key>

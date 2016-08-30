@@ -14,6 +14,7 @@
 
 from GlyphsApp.plugins import *
 import math
+ALIGN = u"★"
 
 class ShowInterpolation(ReporterPlugin):
 
@@ -71,48 +72,53 @@ class ShowInterpolation(ReporterPlugin):
 		Glyph = Layer.parent
 		Font = Glyph.parent
 		Instances = [ i for i in Font.instances if i.active ]
+		
+		# values for centering:
 		shouldCenter = Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"]
 		centerX = Layer.bounds.origin.x + Layer.bounds.size.width/2
-	
-		if len( Instances ) > 0:
-			# display all instances that have a custom parameter:
-			displayedInterpolationCount = 0
-			for thisInstance in Instances:
-				showInterpolationValue = thisInstance.customParameters["ShowInterpolation"]
-				if showInterpolationValue is not None:
-					interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
-					if shouldCenter:
+		
+		# values for aligning on a node:
+		pathIndex, nodeIndex, xAlign = None, None, None
+		for thisPathIndex, thisPath in enumerate(Layer.paths):
+			for thisNodeIndex, thisNode in enumerate(thisPath.nodes):
+				if thisNode.name == ALIGN:
+					pathIndex, nodeIndex = thisPathIndex, thisNodeIndex
+					xAlign = thisNode.x
+		
+		# Determine whether to display only instances with parameter:
+		displayOnlyParameteredInstances = False
+		for thisInstance in Instances:
+			if thisInstance.customParameters["ShowInterpolation"]:
+				displayOnlyParameteredInstances = True
+		
+		# EITHER display all instances that have a custom parameter,
+		# OR, if no custom parameter is set, display them all:
+		for thisInstance in Instances:
+			showInterpolationValue = thisInstance.customParameters["ShowInterpolation"]
+			if (not displayOnlyParameteredInstances) or (showInterpolationValue is not None):
+				interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
+				if interpolatedLayer is not None:
+					if not xAlign is None:
+						interpolatedPoint = interpolatedLayer.paths[pathIndex].nodes[nodeIndex]
+						xInterpolated = interpolatedPoint.x
+						shift = self.transform( shiftX = (xAlign-xInterpolated) )
+						interpolatedLayer.transform_checkForSelection_doComponents_(shift,False,False)
+					elif shouldCenter:
 						interpolatedLayer = self.recenterLayer(interpolatedLayer, centerX)
-					displayedInterpolationCount += 1
-					if interpolatedLayer is not None:
-						self.colorForParameterValue( showInterpolationValue ).set()
-						self.bezierPathComp(interpolatedLayer).fill()
-			
-			# if no custom parameter is set, display them all:
-			if displayedInterpolationCount == 0:
-				self.colorForParameterValue( None ).set()
-				for thisInstance in Instances:
-					interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
-					if shouldCenter:
-						interpolatedLayer = self.recenterLayer(interpolatedLayer, centerX)
-					if interpolatedLayer is not None:
-						self.bezierPathComp(interpolatedLayer).fill()
-
-	def bezierPathComp( self, thisPath ):
-		"""Compatibility method for bezierPath before v2.3."""
-		try:
-			return thisPath.bezierPath() # until v2.2
-		except Exception as e:
-			return thisPath.bezierPath # v2.3+
+					self.colorForParameterValue( showInterpolationValue ).set()
+					interpolatedLayer.bezierPath.fill()
 	
 	def glyphInterpolation( self, thisGlyph, thisInstance ):
 		"""
 		Yields a layer.
 		"""
 		try:
+			# calculate interpolation:
 			interpolatedFont = thisInstance.pyobjc_instanceMethods.interpolatedFont()
 			interGlyphs = interpolatedFont.glyphForName_(thisGlyph.name)
-			interpolatedLayer = interGlyphs.layerForKey_(interpolatedFont.fontMasterID())
+			interpolatedLayer = interGlyphs.layerForKey_(interpolatedFont.fontMasterID()).copyDecomposedLayer()
+			
+			# round to grid if necessary:
 			thisFont = thisGlyph.parent
 			if not thisInstance.customParameters["Grid Spacing"] and not ( thisFont.gridMain() / thisFont.gridSubDivision() ):
 				interpolatedLayer.roundCoordinates()
@@ -154,8 +160,35 @@ class ShowInterpolation(ReporterPlugin):
 			self.logToConsole( "colorForParameterValue: %s" % str(e) )
 	
 	def conditionalContextMenus(self):
-		# Empty list of context menu items
 		contextMenus = []
+		
+		thisLayer = Glyphs.font.selectedLayers[0]
+		thisSelection = thisLayer.selection
+		if len(thisSelection) == 1 and type(thisSelection[0]) == GSNode:
+			thisNode = thisSelection[0]
+			if thisNode.name != ALIGN:
+				contextMenus.append(
+					{
+						'name': Glyphs.localize({
+							'en': u'Align Interpolations at Selected Node',
+							'de': u'Interpolationen an ausgewähltem Punkt ausrichten',
+							'es': u'Alinear las interpolaciones a nodo seleccionado',
+							'fr': u'Aligner les interpolations au point selectionné'
+						}), 'action': self.alignAtNode
+					},
+				)
+			else:
+				contextMenus.append(
+					{
+						'name': Glyphs.localize({
+							'en': u'Do not Align Interpolations at Selected Node',
+							'de': u'Interpolationen nicht an ausgewähltem Punkt ausrichten',
+							'es': u'No alinear las interpolaciones a nodo seleccionado',
+							'fr': u'Ne pas aligner les interpolations au point selectionné'
+						}), 'action': self.doNotAlignAtNode
+					},
+				)
+		
 		if not Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"]:
 			contextMenus.append(
 				{
@@ -184,5 +217,64 @@ class ShowInterpolation(ReporterPlugin):
 
 	def toggleCentering(self):
 		Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"] = not Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"]
-		# Glyphs.update()
+		# Glyphs.update() # causes crash in v919, therefore currently disabled
+	
+	def resetNodeAlignment(self, thisLayer):
+		for thisPath in thisLayer.paths:
+			for thisNode in thisPath.nodes:
+				if thisNode.name == ALIGN:
+					thisNode.name = None
+	
+	def pathAndNodeIndexOfNode(self, requestedNode):
+		"""
+		Returns path and node indexes of the requested node.
+		"""
+		thisLayer = requestedNode.parent.parent
+		
+		# not found:
+		return None, None
+	
+	def setNodeName(self, selectedNode, newNote, otherMaster=False):
+		try:
+			# reset alignment:
+			thisLayer = selectedNode.parent.parent
+			self.resetNodeAlignment(thisLayer)
+			
+			# set alignment:
+			selectedNode.name = newNote
+
+			# set alignment node in other masters too:
+			if not otherMaster:
+				
+				# iterate through all nodes ...
+				pathIndex, nodeIndex = None, None
+				for thisPathIndex, thisPath in enumerate(thisLayer.paths):
+					for thisNodeIndex, thisNode in enumerate(thisPath.nodes):
+						# ... find selected node and record its indexes:
+						if thisNode is selectedNode:
+							pathIndex, nodeIndex = thisPathIndex, thisNodeIndex
+				
+				# go through other masters and set node with recorded indexes:
+				thisGlyph = thisLayer.parent
+				thisFont = thisGlyph.parent
+				masters = [m for m in thisFont.masters if m != thisFont.selectedFontMaster]
+				for thisMaster in masters:
+					id = thisMaster.id
+					masterNode = thisGlyph.layers[id].paths[pathIndex].nodes[nodeIndex]
+					self.setNodeName( masterNode, newNote, otherMaster=True)
+		except Exception as e:
+			import traceback
+			print traceback.format_exc()
+	
+	def alignAtNode(self):
+		thisLayer = Glyphs.font.selectedLayers[0]
+		thisSelection = thisLayer.selection
+		selectedNode = thisSelection[0]
+		
+		self.resetNodeAlignment(Glyphs.font.selectedLayers[0])
+		self.setNodeName(selectedNode,ALIGN)
+	
+	def doNotAlignAtNode(self):
+		self.resetNodeAlignment(Glyphs.font.selectedLayers[0])
+		# self.setNodeName(None)
 		
