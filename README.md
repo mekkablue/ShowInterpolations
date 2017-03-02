@@ -58,7 +58,7 @@ The Value defines the color of the instance. You can either leave the value blan
 
 ### Requirements
 
-The plugin needs Glyphs 2.x or higher, running on OS X 10.9.5 or later.
+The plugin needs Glyphs 2.3 or higher, running on OS X 10.9.5 or later.
 
 ### License
 
