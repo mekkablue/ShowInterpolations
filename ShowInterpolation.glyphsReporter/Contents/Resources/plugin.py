@@ -115,14 +115,14 @@ class ShowInterpolation(ReporterPlugin):
 		try:
 			# calculate interpolation:
 			interpolatedFont = thisInstance.interpolatedFont
-			interpolatedGlyph = interpolatedFont.glyphs[thisGlyph.name]
-			interpolatedLayer = interpolatedGlyph.layers[0]
+			interpolatedLayer = interpolatedFont.glyphs[thisGlyph.name].layers[0]
+			if interpolatedLayer.components:
+				interpolatedLayer.decomposeComponents()
 			
 			# round to grid if necessary:
-			thisFont = thisGlyph.parent
-			if not thisInstance.customParameters["Grid Spacing"] and not ( thisFont.gridMain() / thisFont.gridSubDivision() ):
-				interpolatedLayer.roundCoordinates()
-			if len( interpolatedLayer.paths ) != 0:
+			if interpolatedLayer.paths:
+				if interpolatedFont.gridLength == 1.0:
+					interpolatedLayer.roundCoordinates()
 				return interpolatedLayer
 			else:
 				return None
