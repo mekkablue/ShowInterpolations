@@ -114,9 +114,9 @@ class ShowInterpolation(ReporterPlugin):
 		"""
 		try:
 			# calculate interpolation:
-			interpolatedFont = thisInstance.pyobjc_instanceMethods.interpolatedFont()
-			interGlyphs = interpolatedFont.glyphForName_(thisGlyph.name)
-			interpolatedLayer = interGlyphs.layerForKey_(interpolatedFont.fontMasterID()).copyDecomposedLayer()
+			interpolatedFont = thisInstance.interpolatedFont
+			interpolatedGlyph = interpolatedFont.glyphs[thisGlyph.name]
+			interpolatedLayer = interpolatedGlyph.layers[0]
 			
 			# round to grid if necessary:
 			thisFont = thisGlyph.parent
