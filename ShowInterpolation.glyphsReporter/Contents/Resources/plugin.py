@@ -76,7 +76,7 @@ class ShowInterpolation(ReporterPlugin):
 		# values for centering:
 		shouldCenter = Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"]
 		centerX = Layer.bounds.origin.x + Layer.bounds.size.width/2
-		
+
 		# values for aligning on a node:
 		pathIndex, nodeIndex, xAlign = None, None, None
 		for thisPathIndex, thisPath in enumerate(Layer.paths):
@@ -90,7 +90,7 @@ class ShowInterpolation(ReporterPlugin):
 		for thisInstance in Instances:
 			if thisInstance.customParameters["ShowInterpolation"]:
 				displayOnlyParameteredInstances = True
-		
+
 		# EITHER display all instances that have a custom parameter,
 		# OR, if no custom parameter is set, display them all:
 		for thisInstance in Instances:
@@ -107,15 +107,17 @@ class ShowInterpolation(ReporterPlugin):
 						interpolatedLayer = self.recenterLayer(interpolatedLayer, centerX)
 					self.colorForParameterValue( showInterpolationValue ).set()
 					interpolatedLayer.bezierPath.fill()
-	
+
 	def glyphInterpolation( self, thisGlyph, thisInstance ):
 		"""
 		Yields a layer.
 		"""
 		try:
 			# calculate interpolation:
-			interpolatedFont = thisInstance.interpolatedFont
-			interpolatedLayer = interpolatedFont.glyphs[thisGlyph.name].layers[0]
+			# interpolatedFont = thisInstance.interpolatedFont # too slow still
+			interpolatedFont = thisInstance.pyobjc_instanceMethods.interpolatedFont()
+			interpolatedLayer = interpolatedFont.glyphForName_(thisGlyph.name).layers[0]
+			
 			if interpolatedLayer.components:
 				interpolatedLayer.decomposeComponents()
 			
@@ -126,6 +128,7 @@ class ShowInterpolation(ReporterPlugin):
 				return interpolatedLayer
 			else:
 				return None
+			
 		except:
 			import traceback
 			print traceback.format_exc()
