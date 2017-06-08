@@ -65,9 +65,9 @@ class ShowInterpolation(ReporterPlugin):
 		centerX = Layer.bounds.origin.x + Layer.bounds.size.width/2
 
 		# update if the previous and current center are off sync
-		# only act if the new difference is at least 1 pixel to avoid 
+		# only act if the new difference is at least 1 unit to avoid 
 		# rounding jitter
-		if centerX != newCenterX and abs(centerX - newCenterX) > 1:
+		if abs(centerX - newCenterX) > 1.0:
 			shift = self.transform( float(newCenterX-centerX) )
 			Layer.transform_checkForSelection_doComponents_(shift,False,False)
 		return Layer
