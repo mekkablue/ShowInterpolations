@@ -60,10 +60,14 @@ class ShowInterpolation(ReporterPlugin):
 			skewTransform.setTransformStruct_(skewStruct)
 			myTransform.appendTransform_(skewTransform)
 		return myTransform
-	
+
 	def recenterLayer(self, Layer, newCenterX):
 		centerX = Layer.bounds.origin.x + Layer.bounds.size.width/2
-		if centerX != newCenterX:
+
+		# update if the previous and current center are off sync
+		# only act if the new difference is at least 1 pixel to avoid 
+		# rounding jitter
+		if centerX != newCenterX and abs(centerX - newCenterX) > 1:
 			shift = self.transform( float(newCenterX-centerX) )
 			Layer.transform_checkForSelection_doComponents_(shift,False,False)
 		return Layer
