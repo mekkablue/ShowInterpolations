@@ -73,44 +73,47 @@ class ShowInterpolation(ReporterPlugin):
 		return Layer
 	
 	def background(self, Layer):
-		Glyph = Layer.parent
-		Font = Glyph.parent
-		Instances = [ i for i in Font.instances if i.active ]
+		if Layer:
+			Glyph = Layer.parent
+			if Glyph:
+				Font = Glyph.parent
+				if Font:
+					Instances = [ i for i in Font.instances if i.active ]
 		
-		# values for centering:
-		shouldCenter = Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"]
-		centerX = Layer.bounds.origin.x + Layer.bounds.size.width/2
+					# values for centering:
+					shouldCenter = Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"]
+					centerX = Layer.bounds.origin.x + Layer.bounds.size.width/2
 
-		# values for aligning on a node:
-		pathIndex, nodeIndex, xAlign = None, None, None
-		for thisPathIndex, thisPath in enumerate(Layer.paths):
-			for thisNodeIndex, thisNode in enumerate(thisPath.nodes):
-				if thisNode.name == ALIGN:
-					pathIndex, nodeIndex = thisPathIndex, thisNodeIndex
-					xAlign = thisNode.x
+					# values for aligning on a node:
+					pathIndex, nodeIndex, xAlign = None, None, None
+					for thisPathIndex, thisPath in enumerate(Layer.paths):
+						for thisNodeIndex, thisNode in enumerate(thisPath.nodes):
+							if thisNode.name == ALIGN:
+								pathIndex, nodeIndex = thisPathIndex, thisNodeIndex
+								xAlign = thisNode.x
 		
-		# Determine whether to display only instances with parameter:
-		displayOnlyParameteredInstances = False
-		for thisInstance in Instances:
-			if thisInstance.customParameters["ShowInterpolation"]:
-				displayOnlyParameteredInstances = True
+					# Determine whether to display only instances with parameter:
+					displayOnlyParameteredInstances = False
+					for thisInstance in Instances:
+						if thisInstance.customParameters["ShowInterpolation"]:
+							displayOnlyParameteredInstances = True
 
-		# EITHER display all instances that have a custom parameter,
-		# OR, if no custom parameter is set, display them all:
-		for thisInstance in Instances:
-			showInterpolationValue = thisInstance.customParameters["ShowInterpolation"]
-			if (not displayOnlyParameteredInstances) or (showInterpolationValue is not None):
-				interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
-				if interpolatedLayer is not None:
-					if not xAlign is None:
-						interpolatedPoint = interpolatedLayer.paths[pathIndex].nodes[nodeIndex]
-						xInterpolated = interpolatedPoint.x
-						shift = self.transform( shiftX = (xAlign-xInterpolated) )
-						interpolatedLayer.transform_checkForSelection_doComponents_(shift,False,False)
-					elif shouldCenter:
-						interpolatedLayer = self.recenterLayer(interpolatedLayer, centerX)
-					self.colorForParameterValue( showInterpolationValue ).set()
-					interpolatedLayer.bezierPath.fill()
+					# EITHER display all instances that have a custom parameter,
+					# OR, if no custom parameter is set, display them all:
+					for thisInstance in Instances:
+						showInterpolationValue = thisInstance.customParameters["ShowInterpolation"]
+						if (not displayOnlyParameteredInstances) or (showInterpolationValue is not None):
+							interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
+							if interpolatedLayer is not None:
+								if not xAlign is None:
+									interpolatedPoint = interpolatedLayer.paths[pathIndex].nodes[nodeIndex]
+									xInterpolated = interpolatedPoint.x
+									shift = self.transform( shiftX = (xAlign-xInterpolated) )
+									interpolatedLayer.transform_checkForSelection_doComponents_(shift,False,False)
+								elif shouldCenter:
+									interpolatedLayer = self.recenterLayer(interpolatedLayer, centerX)
+								self.colorForParameterValue( showInterpolationValue ).set()
+								interpolatedLayer.bezierPath.fill()
 
 	def glyphInterpolation( self, thisGlyph, thisInstance ):
 		"""
@@ -231,16 +234,7 @@ class ShowInterpolation(ReporterPlugin):
 			for thisNode in thisPath.nodes:
 				if thisNode.name == ALIGN:
 					thisNode.name = None
-	
-	def pathAndNodeIndexOfNode(self, requestedNode):
-		"""
-		Returns path and node indexes of the requested node.
-		"""
-		thisLayer = requestedNode.parent.parent
 		
-		# not found:
-		return None, None
-	
 	def setNodeName(self, selectedNode, newNote, otherMaster=False):
 		try:
 			# reset alignment:
