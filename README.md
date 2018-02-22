@@ -47,23 +47,25 @@ from the context menu.
 
 ### Custom Parameter
 
-To only view specific interpolations, add this custom parameter to the instance(s) you want to preview:
+To only view specific interpolations, add this custom parameter to the instance(s) you want to preview in *File > Font Info > Instances:*
 
     Property: ShowInterpolation
     Value: -
     Value: .1;.8;.2
     Value: 1;0.5;0;0.1
 
-The Value defines the color of the instance. You can either leave the value blank to use the default color. Or, you can set semicolon-separated RGB values between 0 and 1. If you supply a fourth value, it will be interpreted as alpha (opacity).
+The Value defines the color of the instance. You can either leave the value blank to use the default color. Or, you can set semicolon-separated RGB values between 0 and 1. If you supply a fourth value, it will be interpreted as alpha (opacity: 1.0 = opaque, 0.0 = invisible).
+
+If you want to change the color *globally,* add the parameter in *File > Font Info > Font > Custom Parameters.* 
 
 ### Requirements
 
-The plugin needs Glyphs 2.3 or higher, running on OS X 10.9.5 or later.
+The plugin needs Glyphs 2.4 or higher, running on OS X 10.9.5 or later.
 
 ### License
 
-Copyright 2014 Rainer Erich Scheichelbauer (@mekkablue).
-Based on sample code by Georg Seifert (@schriftgestalt).
+Copyright 2014-2018 Rainer Erich Scheichelbauer (@mekkablue).
+Based on sample code by Georg Seifert (@schriftgestalt) and Jan Gerner (@yanone).
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

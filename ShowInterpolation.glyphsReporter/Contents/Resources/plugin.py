@@ -97,6 +97,9 @@ class ShowInterpolation(ReporterPlugin):
 					for thisInstance in Instances:
 						if thisInstance.customParameters["ShowInterpolation"]:
 							displayOnlyParameteredInstances = True
+					
+					# check for value set in Font Info > Font > Custom Parameters:
+					globalInterpolationValue = Font.customParameters["ShowInterpolation"]
 
 					# EITHER display all instances that have a custom parameter,
 					# OR, if no custom parameter is set, display them all:
@@ -112,7 +115,7 @@ class ShowInterpolation(ReporterPlugin):
 									interpolatedLayer.transform_checkForSelection_doComponents_(shift,False,False)
 								elif shouldCenter:
 									interpolatedLayer = self.recenterLayer(interpolatedLayer, centerX)
-								self.colorForParameterValue( showInterpolationValue ).set()
+								self.colorForParameterValue( showInterpolationValue, globalInterpolationValue ).set()
 								interpolatedLayer.bezierPath.fill()
 
 	def glyphInterpolation( self, thisGlyph, thisInstance ):
@@ -141,7 +144,7 @@ class ShowInterpolation(ReporterPlugin):
 			print traceback.format_exc()
 			return None
 	
-	def colorForParameterValue( self, parameterString ):
+	def colorForParameterValue( self, instanceParameterString, fallbackParameterString ):
 		"""
 		Turns '0.3;0.4;0.9' into RGB values and returns an NSColor object.
 		"""
@@ -149,19 +152,21 @@ class ShowInterpolation(ReporterPlugin):
 			# default color:
 			RGBA = [ 0.4, 0.0, 0.3, 0.15 ]
 			
-			# if set, take user input as color:
-			if parameterString is not None:
-				parameterValues = parameterString.split(";")
-				for i in range(len( parameterValues )):
-					thisValueString = parameterValues[i]
-					try:
-						thisValue = abs(float( thisValueString ))
-						if thisValue > 1.0:
-							thisValue %= 1.0
-						RGBA[i] = thisValue
-					except Exception as e:
-						pass
-						# self.logToConsole( "Could not convert '%s' (from '%s') to a float. Keeping default." % (thisValueString, parameterString) )
+			# first overwrite with font-wide color,
+			# then again with instance color:
+			for parameterString in (fallbackParameterString, instanceParameterString):
+				if parameterString is not None:
+					parameterValues = parameterString.split(";")
+					for i in range(len( parameterValues )):
+						thisValueString = parameterValues[i]
+						try:
+							thisValue = abs(float( thisValueString ))
+							if thisValue > 1.0:
+								thisValue %= 1.0
+							RGBA[i] = thisValue
+						except Exception as e:
+							pass
+							# self.logToConsole( "Could not convert '%s' (from '%s') to a float. Keeping default." % (thisValueString, parameterString) )
 			
 			# return the color:
 			thisColor = NSColor.colorWithCalibratedRed_green_blue_alpha_( RGBA[0], RGBA[1], RGBA[2], RGBA[3] )
