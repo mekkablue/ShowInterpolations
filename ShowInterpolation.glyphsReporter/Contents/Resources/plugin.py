@@ -13,7 +13,9 @@
 
 
 from GlyphsApp.plugins import *
+from GlyphsApp import GSNode
 import math
+
 ALIGN = u"★"
 
 class ShowInterpolation(ReporterPlugin):
@@ -27,8 +29,8 @@ class ShowInterpolation(ReporterPlugin):
 		})
 		
 		# default centering setting:
-		if Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"] is None:
-			Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"] = False
+		Glyphs.registerDefault("com.mekkablue.ShowInterpolation.centering", 0)
+		Glyphs.registerDefault("com.mekkablue.ShowInterpolation.anchors", 0)
 	
 	def transform(self, shiftX=0.0, shiftY=0.0, rotate=0.0, skew=0.0, scale=1.0):
 		"""
@@ -81,7 +83,6 @@ class ShowInterpolation(ReporterPlugin):
 					Instances = [ i for i in Font.instances if i.active ]
 		
 					# values for centering:
-					shouldCenter = Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"]
 					centerX = Layer.bounds.origin.x + Layer.bounds.size.width/2
 
 					# values for aligning on a node:
@@ -108,15 +109,32 @@ class ShowInterpolation(ReporterPlugin):
 						if (not displayOnlyParameteredInstances) or (showInterpolationValue is not None):
 							interpolatedLayer = self.glyphInterpolation( Glyph, thisInstance )
 							if interpolatedLayer is not None:
+								
+								# draw interpolated paths+components:
 								if not xAlign is None:
 									interpolatedPoint = interpolatedLayer.paths[pathIndex].nodes[nodeIndex]
 									xInterpolated = interpolatedPoint.x
 									shift = self.transform( shiftX = (xAlign-xInterpolated) )
 									interpolatedLayer.transform_checkForSelection_doComponents_(shift,False,False)
-								elif shouldCenter:
+								elif Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"]:
 									interpolatedLayer = self.recenterLayer(interpolatedLayer, centerX)
+									
+								# set color:
 								self.colorForParameterValue( showInterpolationValue, globalInterpolationValue ).set()
 								interpolatedLayer.bezierPath.fill()
+								
+								# draw anchors:
+								if Glyphs.defaults["com.mekkablue.ShowInterpolation.anchors"]:
+									NSColor.colorWithRed_green_blue_alpha_(0.3, 0.1, 0.1, 0.5).set()
+									for thisAnchor in interpolatedLayer.anchors:
+										self.roundDotForPoint( thisAnchor.position, 5.0/self.getScale() ).fill()
+	
+	def roundDotForPoint( self, thisPoint, markerWidth ):
+		"""
+		Returns a circle with the radius markerWidth around thisPoint.
+		"""
+		myRect = NSRect( ( thisPoint.x - markerWidth * 0.5, thisPoint.y - markerWidth * 0.5 ), ( markerWidth, markerWidth ) )
+		return NSBezierPath.bezierPathWithOvalInRect_(myRect)
 
 	def glyphInterpolation( self, thisGlyph, thisInstance ):
 		"""
