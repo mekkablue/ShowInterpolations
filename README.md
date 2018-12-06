@@ -6,7 +6,7 @@ By default, it draws all active instances on top of each other using a transpare
 
 ![All instances are shown live.](ShowInterpolations.png "Show Interpolations Screenshot")
 
-After installation, it will add the menu item *View > Show Interpolations* (de: *Interpolationen zeigen*, fr: *Montrer Interpolations*, es: *Mostrar Interpolaciones*).
+After installation, it will add the menu item *View > Show Interpolations* (de: *Interpolationen zeigen,* fr: *Montrer Interpolations,* es: *Mostrar Interpolaciones,* zh: 💗插值).
 You can set a keyboard shortcut in System Preferences.
 
 ### Installation
@@ -22,26 +22,18 @@ Please install the plugin via the built-in Plugin Manager, available via *Window
 1. Open a glyph in Edit View.
 2. Use *View > Show Interpolations* to toggle the preview of the instances.
 
-To center the interpolations under the frontmost layer, Ctrl- or right-click anywhere in the canvas to invoke the context menu, and choose 
-*Center Interpolations* 
-(de: *Interpolationen zentrieren*, 
-fr: *Centrer interpolations*, 
-es: *Centrar interpolaciones*). 
+To center the interpolations under the frontmost layer, Ctrl- or right-click anywhere in the canvas to invoke the context menu, and choose *Center Interpolations* (de: *Interpolationen zentrieren,* fr: *Centrer interpolations,* es: *Centrar interpolaciones,* zh: 以中心对齐). 
 
 ![Toggle the centering of interpolations via the context menu](ShowInterpolationsContextMenu.png "Show Interpolations Context Menu")
 
-To toggle the setting back, open the context menu again, and choose *Do Not Center Interpolations* (de: *Interpolationen nicht zentrieren*, es: *No centrar las interpolaciones*, fr: *Ne pas centrer les interpolations*).
-
 Alternatively, you can also align at a certain node. To do that, select a node, bring up the context menu, and choose 
-*Align Interpolations at Selected Node* 
-(de: *Interpolationen an ausgewähltem Punkt ausrichten*,
-es: *Alinear las interpolaciones a nodo seleccionado*,
-fr: *Aligner les interpolations au point selectionné*).
+*Align Interpolations at Selected Node* (de: *Interpolationen an ausgewähltem Punkt ausrichten,* es: *Alinear las interpolaciones a nodo seleccionado,* fr: *Aligner les interpolations au point selectionné,* zh: 以所选点为基点对齐).
 The node in question will then be marked with a star. To cancel point alignment, select the starred node, and choose 
 *Do not Align Interpolations at Selected Node*
-(de: *Interpolationen nicht an ausgewähltem Punkt ausrichten*,
-es: *No alinear las interpolaciones a nodo seleccionado*,
-fr: *Ne pas aligner les interpolations au point selectionné*)
+(de: *Interpolationen nicht an ausgewähltem Punkt ausrichten,*
+es: *No alinear las interpolaciones a nodo seleccionado,*
+fr: *Ne pas aligner les interpolations au point selectionné,*
+zh: 不以所选点为基点对齐)
 from the context menu.
 
 
