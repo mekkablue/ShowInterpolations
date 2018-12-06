@@ -17,15 +17,15 @@
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleVersion</key>
-	<string>21</string>
+	<string>22</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.1.1</string>
+	<string>2.1.2</string>
 	<key>UpdateFeedURL</key>
 	<string>https://raw.githubusercontent.com/mekkablue/ShowInterpolations/master/ShowInterpolation.glyphsReporter/Contents/Info.plist</string>
 	<key>productPageURL</key>
 	<string>https://github.com/mekkablue/ShowInterpolations</string>
 	<key>productReleaseNotes</key>
-	<string>Fixed aligning at point; added secret option to display anchor interpolations: com.mekkablue.ShowInterpolation.anchors.</string>
+	<string>Added Chinese localisation, thx 刘钊， 宋熙然， 杨翕丞， 张大可.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright, Rainer Erich Scheichelbauer, 2014-2018</string>
 	<key>NSMainNibFile</key>

@@ -25,7 +25,8 @@ class ShowInterpolation(ReporterPlugin):
 			'en': u'Interpolations',
 			'de': u'Interpolationen',
 			'es': u'interpolaciones',
-			'fr': u'interpolations'
+			'fr': u'interpolations',
+			'zh': u'💗插值',
 		})
 		
 		# default centering setting:
@@ -206,7 +207,8 @@ class ShowInterpolation(ReporterPlugin):
 							'en': u'Align Interpolations at Selected Node',
 							'de': u'Interpolationen an ausgewähltem Punkt ausrichten',
 							'es': u'Alinear las interpolaciones a nodo seleccionado',
-							'fr': u'Aligner les interpolations au point selectionné'
+							'fr': u'Aligner les interpolations au point selectionné',
+							'zh': u'以所选点为基点对齐',
 						}), 'action': self.alignAtNode
 					},
 				)
@@ -217,33 +219,25 @@ class ShowInterpolation(ReporterPlugin):
 							'en': u'Do not Align Interpolations at Selected Node',
 							'de': u'Interpolationen nicht an ausgewähltem Punkt ausrichten',
 							'es': u'No alinear las interpolaciones a nodo seleccionado',
-							'fr': u'Ne pas aligner les interpolations au point selectionné'
+							'fr': u'Ne pas aligner les interpolations au point selectionné',
+							'zh': u'不以所选点为基点对齐',
 						}), 'action': self.doNotAlignAtNode
 					},
 				)
 		
-		if not Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"]:
-			contextMenus.append(
-				{
-					'name': Glyphs.localize({
-						'en': u'Center Interpolations',
-						'de': u'Interpolationen zentrieren',
-						'es': u'Centrar las interpolaciones',
-						'fr': u'Centrer les interpolations'
-					}), 'action': self.toggleCentering
-				},
-			)
-		else:
-			contextMenus.append(
-				{
-					'name': Glyphs.localize({
-						'en': u'Do Not Center Interpolations',
-						'de': u'Interpolationen nicht zentrieren',
-						'es': u'No centrar las interpolaciones',
-						'fr': u'Ne pas centrer les interpolations'
-					}), 'action': self.toggleCentering
-				},
-			)
+		contextMenus.append(
+			{
+				'name': Glyphs.localize({
+					'en': u'Center Interpolations',
+					'de': u'Interpolationen zentrieren',
+					'es': u'Centrar las interpolaciones',
+					'fr': u'Centrer les interpolations',
+					'zh': u'以中心对齐',
+				}),
+				'action': self.toggleCentering,
+				'state': Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"],
+			},
+		)
 
 		# Return list of context menu items
 		return contextMenus
