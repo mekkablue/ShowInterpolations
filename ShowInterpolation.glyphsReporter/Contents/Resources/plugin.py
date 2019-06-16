@@ -81,7 +81,7 @@ class ShowInterpolation(ReporterPlugin):
 			if Glyph:
 				Font = Glyph.parent
 				if Font:
-					Instances = [ i for i in Font.instances if i.active ]
+					Instances = [ i for i in Font.instances if i.active or Glyphs.defaults["com.mekkablue.ShowInterpolation.showDisabledInstances"] ]
 		
 					# values for centering:
 					centerX = Layer.bounds.origin.x + Layer.bounds.size.width/2
