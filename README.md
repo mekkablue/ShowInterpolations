@@ -50,6 +50,14 @@ The Value defines the color of the instance. You can either leave the value blan
 
 If you want to change the color *globally,* add the parameter in *File > Font Info > Font > Custom Parameters.* 
 
+### Extra Settings
+
+If you want the plug-in to also display inactive instances, run this in Macro Window:
+
+```
+Glyphs.defaults["com.mekkablue.ShowInterpolation.showDisabledInstances"]=True
+```
+
 ### Requirements
 
 The plugin needs Glyphs 2.4 or higher, running on OS X 10.9.5 or later.
