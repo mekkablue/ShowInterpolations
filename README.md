@@ -1,4 +1,4 @@
-# ShowInterpolations.glyphsReporter
+# Show Interpolations
 
 This is a plugin for the [Glyphs font editor](http://glyphsapp.com/) by Georg Seifert.
 It calculates all active instances for the given glyph and draws them behind your paths.
@@ -28,13 +28,7 @@ To center the interpolations under the frontmost layer, Ctrl- or right-click any
 
 Alternatively, you can also align at a certain node. To do that, select a node, bring up the context menu, and choose 
 *Align Interpolations at Selected Node* (de: *Interpolationen an ausgewähltem Punkt ausrichten,* es: *Alinear las interpolaciones a nodo seleccionado,* fr: *Aligner les interpolations au point selectionné,* zh: 以所选点为基点对齐).
-The node in question will then be marked with a star. To cancel point alignment, select the starred node, and choose 
-*Do not Align Interpolations at Selected Node*
-(de: *Interpolationen nicht an ausgewähltem Punkt ausrichten,*
-es: *No alinear las interpolaciones a nodo seleccionado,*
-fr: *Ne pas aligner les interpolations au point selectionné,*
-zh: 不以所选点为基点对齐)
-from the context menu.
+The node in question will then be marked with a star. To cancel point alignment, select the starred node, and choose  *Do not Align Interpolations at Selected Node* (de: *Interpolationen nicht an ausgewähltem Punkt ausrichten,* es: *No alinear las interpolaciones a nodo seleccionado,* fr: *Ne pas aligner les interpolations au point selectionné,* zh: 不以所选点为基点对齐) from the context menu.
 
 
 ### Custom Parameter
