@@ -13,15 +13,15 @@
 	<key>CFBundleName</key>
 	<string>ShowStyles</string>
 	<key>CFBundleVersion</key>
-	<string>24</string>
+	<string>25</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.1.4</string>
+	<string>2.1.5</string>
 	<key>UpdateFeedURL</key>
-	<string>https://raw.githubusercontent.com/mekkablue/ShowStyless/master/ShowStyles.glyphsReporter/Contents/Info.plist</string>
+	<string>https://raw.githubusercontent.com/mekkablue/ShowInterpolation/master/ShowStyles.glyphsReporter/Contents/Info.plist</string>
 	<key>productPageURL</key>
-	<string>https://github.com/mekkablue/ShowStyless</string>
+	<string>https://github.com/mekkablue/ShowInterpolation</string>
 	<key>productReleaseNotes</key>
-	<string>Glyphs 3 compatibility.</string>
+	<string>Glyphs 3 compatibility, fixed update URLs.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright, Rainer Erich Scheichelbauer, 2014-2020</string>
 	<key>NSPrincipalClass</key>
