@@ -146,7 +146,7 @@ class ShowStyles(ReporterPlugin):
 										alpha = min(0.9, max(0.05, color.alphaComponent() * alphaFactor))
 									color.colorWithAlphaComponent_(alpha).set()
 									interpolatedLayer.completeBezierPath.fill()
-								
+									
 									# draw anchors:
 									if Glyphs.defaults["com.mekkablue.ShowStyles.anchors"]:
 										NSColor.colorWithRed_green_blue_alpha_(0.3, 0.1, 0.1, 0.5).set()
