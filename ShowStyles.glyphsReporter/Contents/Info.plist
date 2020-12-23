@@ -12,16 +12,10 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>ShowStyles</string>
-	<key>CFBundleVersion</key>
-	<string>25</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.1.5</string>
-	<key>UpdateFeedURL</key>
-	<string>https://raw.githubusercontent.com/mekkablue/ShowInterpolations/master/ShowStyles.glyphsReporter/Contents/Info.plist</string>
-	<key>productPageURL</key>
-	<string>https://github.com/mekkablue/ShowInterpolations</string>
-	<key>productReleaseNotes</key>
-	<string>Glyphs 3 compatibility, fixed update URLs.</string>
+	<string>2.1.6</string>
+	<key>CFBundleVersion</key>
+	<string>26</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright, Rainer Erich Scheichelbauer, 2014-2020</string>
 	<key>NSPrincipalClass</key>
@@ -30,5 +24,11 @@
 	<array>
 		<string>plugin.py</string>
 	</array>
+	<key>UpdateFeedURL</key>
+	<string>https://raw.githubusercontent.com/mekkablue/ShowInterpolations/master/ShowStyles.glyphsReporter/Contents/Info.plist</string>
+	<key>productPageURL</key>
+	<string>https://github.com/mekkablue/ShowInterpolations</string>
+	<key>productReleaseNotes</key>
+	<string>update binary files for Glyphs3</string>
 </dict>
 </plist>
