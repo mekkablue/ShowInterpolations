@@ -39,6 +39,7 @@ class ShowStyles(ReporterPlugin):
 		Glyphs.registerDefault("com.mekkablue.ShowStyles.centering", 0)
 		Glyphs.registerDefault("com.mekkablue.ShowStyles.anchors", 0)
 	
+	@objc.python_method
 	def transform(self, shiftX=0.0, shiftY=0.0, rotate=0.0, skew=0.0, scale=1.0):
 		"""
 		Returns an NSAffineTransform object for transforming layers.
@@ -275,6 +276,7 @@ class ShowStyles(ReporterPlugin):
 		# Return list of context menu items
 		return contextMenus
 
+	@objc.python_method	
 	def toggleCentering_(self, sender=None):
 		Glyphs.defaults["com.mekkablue.ShowStyles.centering"] = not Glyphs.defaults["com.mekkablue.ShowStyles.centering"]
 		Glyphs.font.currentTab.forceRedraw()
@@ -320,6 +322,7 @@ class ShowStyles(ReporterPlugin):
 			import traceback
 			print(traceback.format_exc())
 	
+	@objc.python_method
 	def alignAtNode_(self, sender=None):
 		thisLayer = Glyphs.font.selectedLayers[0]
 		thisSelection = thisLayer.selection
@@ -327,6 +330,7 @@ class ShowStyles(ReporterPlugin):
 		self.resetNodeAlignment(Glyphs.font.selectedLayers[0])
 		self.setNodeName(selectedNode,ALIGN)
 	
+	@objc.python_method
 	def doNotAlignAtNode_(self, sender=None):
 		self.resetNodeAlignment(Glyphs.font.selectedLayers[0])
 		# self.setNodeName(None)

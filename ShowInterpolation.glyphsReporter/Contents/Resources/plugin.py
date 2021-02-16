@@ -20,6 +20,7 @@ ALIGN = u"★"
 
 class ShowInterpolation(ReporterPlugin):
 
+	@objc.python_method
 	def settings(self):
 		self.menuName = Glyphs.localize({
 			'en': u'Interpolations',
@@ -32,7 +33,8 @@ class ShowInterpolation(ReporterPlugin):
 		# default centering setting:
 		Glyphs.registerDefault("com.mekkablue.ShowInterpolation.centering", 0)
 		Glyphs.registerDefault("com.mekkablue.ShowInterpolation.anchors", 0)
-	
+
+	@objc.python_method
 	def transform(self, shiftX=0.0, shiftY=0.0, rotate=0.0, skew=0.0, scale=1.0):
 		"""
 		Returns an NSAffineTransform object for transforming layers.
@@ -64,6 +66,7 @@ class ShowInterpolation(ReporterPlugin):
 			myTransform.appendTransform_(skewTransform)
 		return myTransform
 
+	@objc.python_method
 	def recenterLayer(self, Layer, newCenterX):
 		centerX = Layer.bounds.origin.x + Layer.bounds.size.width/2
 
@@ -74,7 +77,8 @@ class ShowInterpolation(ReporterPlugin):
 			shift = self.transform( float(newCenterX-centerX) )
 			Layer.transform_checkForSelection_doComponents_(shift,False,False)
 		return Layer
-	
+
+	@objc.python_method
 	def background(self, Layer):
 		if Layer:
 			Glyph = Layer.parent
@@ -129,7 +133,8 @@ class ShowInterpolation(ReporterPlugin):
 									NSColor.colorWithRed_green_blue_alpha_(0.3, 0.1, 0.1, 0.5).set()
 									for thisAnchor in interpolatedLayer.anchors:
 										self.roundDotForPoint( thisAnchor.position, 5.0/self.getScale() ).fill()
-	
+
+	@objc.python_method
 	def roundDotForPoint( self, thisPoint, markerWidth ):
 		"""
 		Returns a circle with the radius markerWidth around thisPoint.
@@ -137,6 +142,7 @@ class ShowInterpolation(ReporterPlugin):
 		myRect = NSRect( ( thisPoint.x - markerWidth * 0.5, thisPoint.y - markerWidth * 0.5 ), ( markerWidth, markerWidth ) )
 		return NSBezierPath.bezierPathWithOvalInRect_(myRect)
 
+	@objc.python_method	
 	def glyphInterpolation( self, thisGlyph, thisInstance ):
 		"""
 		Yields a layer.
@@ -162,7 +168,8 @@ class ShowInterpolation(ReporterPlugin):
 			import traceback
 			print traceback.format_exc()
 			return None
-	
+
+	@objc.python_method
 	def colorForParameterValue( self, instanceParameterString, fallbackParameterString ):
 		"""
 		Turns '0.3;0.4;0.9' into RGB values and returns an NSColor object.
@@ -192,7 +199,8 @@ class ShowInterpolation(ReporterPlugin):
 			return thisColor
 		except Exception as e:
 			self.logToConsole( "colorForParameterValue: %s" % str(e) )
-	
+
+	@objc.python_method
 	def conditionalContextMenus(self):
 		contextMenus = []
 		
@@ -242,16 +250,19 @@ class ShowInterpolation(ReporterPlugin):
 		# Return list of context menu items
 		return contextMenus
 
+	@objc.python_method	
 	def toggleCentering(self):
 		Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"] = not Glyphs.defaults["com.mekkablue.ShowInterpolation.centering"]
 		# Glyphs.update() # causes crash in v919, therefore currently disabled
-	
+
+	@objc.python_method
 	def resetNodeAlignment(self, thisLayer):
 		for thisPath in thisLayer.paths:
 			for thisNode in thisPath.nodes:
 				if thisNode.name == ALIGN:
 					thisNode.name = None
-		
+
+	@objc.python_method	
 	def setNodeName(self, selectedNode, newNote, otherMaster=False):
 		try:
 			# reset alignment:
@@ -283,7 +294,8 @@ class ShowInterpolation(ReporterPlugin):
 		except Exception as e:
 			import traceback
 			print traceback.format_exc()
-	
+
+	@objc.python_method
 	def alignAtNode(self):
 		thisLayer = Glyphs.font.selectedLayers[0]
 		thisSelection = thisLayer.selection
@@ -291,7 +303,8 @@ class ShowInterpolation(ReporterPlugin):
 		
 		self.resetNodeAlignment(Glyphs.font.selectedLayers[0])
 		self.setNodeName(selectedNode,ALIGN)
-	
+
+	@objc.python_method
 	def doNotAlignAtNode(self):
 		self.resetNodeAlignment(Glyphs.font.selectedLayers[0])
 		# self.setNodeName(None)
