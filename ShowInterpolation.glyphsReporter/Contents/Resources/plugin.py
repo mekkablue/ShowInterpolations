@@ -166,7 +166,7 @@ class ShowInterpolation(ReporterPlugin):
 			
 		except:
 			import traceback
-			print traceback.format_exc()
+			print(traceback.format_exc())
 			return None
 
 	@objc.python_method
@@ -293,7 +293,7 @@ class ShowInterpolation(ReporterPlugin):
 					self.setNodeName( masterNode, newNote, otherMaster=True)
 		except Exception as e:
 			import traceback
-			print traceback.format_exc()
+			print(traceback.format_exc())
 
 	@objc.python_method
 	def alignAtNode(self):
