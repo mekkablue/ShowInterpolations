@@ -33,9 +33,9 @@ The node in question will then be marked with a star. To cancel point alignment,
 
 ### Custom Parameter
 
-To only view specific interpolations, add this custom parameter to the instance(s) you want to preview in *File > Font Info > Instances:*
+To only view specific interpolations, add this custom parameter to the instance(s) you want to preview in *File > Font Info > Exports:*
 
-    Property: ShowInterpolation
+    Property: ShowStyles
     Value: -
     Value: .1;.8;.2
     Value: 1;0.5;0;0.1
@@ -43,6 +43,9 @@ To only view specific interpolations, add this custom parameter to the instance(
 The Value defines the color of the instance. You can either leave the value blank to use the default color. Or, you can set semicolon-separated RGB values between 0 and 1. If you supply a fourth value, it will be interpreted as alpha (opacity: 1.0 = opaque, 0.0 = invisible).
 
 If you want to change the color *globally,* add the parameter in *File > Font Info > Font > Custom Parameters.* 
+
+**Legacy note:** In Glyphs 2, the parameter is called `ShowInterpolation`.
+
 
 ### Extra Settings
 
