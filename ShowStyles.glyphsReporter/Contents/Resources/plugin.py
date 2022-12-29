@@ -276,7 +276,6 @@ class ShowStyles(ReporterPlugin):
 		# Return list of context menu items
 		return contextMenus
 
-	@objc.python_method	
 	def toggleCentering_(self, sender=None):
 		Glyphs.defaults["com.mekkablue.ShowStyles.centering"] = not Glyphs.defaults["com.mekkablue.ShowStyles.centering"]
 		Glyphs.font.currentTab.forceRedraw()
