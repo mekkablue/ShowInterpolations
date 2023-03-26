@@ -68,20 +68,20 @@ class ShowStyles(ReporterPlugin):
 			skewStruct.m21 = tan(radians(skew))
 			skewTransform = NSAffineTransform.transform()
 			skewTransform.setTransformStruct_(skewStruct)
-			myTransform.appendTransform_(skewTransform)
+			myTransform.appendTransform_(skegwTransform)
 		return myTransform
 
 	@objc.python_method
-	def recenterLayer(self, Layer, newCenterX):
-		centerX = Layer.bounds.origin.x + Layer.bounds.size.width/2
+	def recenterLayer(self, layer, newCenterX):
+		centerX = layer.bounds.origin.x + layer.bounds.size.width/2
 
 		# update if the previous and current center are off sync
 		# only act if the new difference is at least 1 unit to avoid 
 		# rounding jitter
-		if abs(centerX - newCenterX) > 1.0:
-			shift = self.transform( float(newCenterX-centerX) )
-			Layer.transform_checkForSelection_doComponents_(shift,False,False)
-		return Layer
+		distance = newCenterX-centerX
+		if abs(distance) > 1.0:
+			shift = self.transform(distance)
+			layer.applyTransform(shift.transformStruct())
 	
 	@objc.python_method
 	def background(self, Layer):
@@ -137,7 +137,7 @@ class ShowStyles(ReporterPlugin):
 										shift = self.transform( shiftX = (xAlign-xInterpolated) )
 										interpolatedLayer.transform_checkForSelection_doComponents_(shift,False,False)
 									elif Glyphs.defaults["com.mekkablue.ShowStyles.centering"]:
-										interpolatedLayer = self.recenterLayer(interpolatedLayer, centerX)
+										self.recenterLayer(interpolatedLayer, centerX)
 									
 									# set color:
 									color = self.colorForParameterValue( instanceColorValue, globalColorValue )
