@@ -13,9 +13,9 @@
 	<key>CFBundleName</key>
 	<string>ShowStyles</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.1.9</string>
+	<string>2.2</string>
 	<key>CFBundleVersion</key>
-	<string>30</string>
+	<string>31</string>
 	<key>UpdateFeedURL</key>
 	<string>https://raw.githubusercontent.com/mekkablue/ShowInterpolations/master/ShowStyles.glyphsReporter/Contents/Info.plist</string>
 	<key>productPageURL</key>
@@ -23,7 +23,7 @@
 	<key>productReleaseNotes</key>
 	<string>Fixed centering</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright, Rainer Erich Scheichelbauer, 2014-2020</string>
+	<string>Copyright, Rainer Erich Scheichelbauer, 2014-2023</string>
 	<key>NSPrincipalClass</key>
 	<string>ShowStyles</string>
 	<key>PyMainFileNames</key>
