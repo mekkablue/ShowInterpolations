@@ -38,38 +38,6 @@ class ShowStyles(ReporterPlugin):
 		# default centering setting:
 		Glyphs.registerDefault("com.mekkablue.ShowStyles.centering", 0)
 		Glyphs.registerDefault("com.mekkablue.ShowStyles.anchors", 0)
-	
-	@objc.python_method
-	def transform(self, shiftX=0.0, shiftY=0.0, rotate=0.0, skew=0.0, scale=1.0):
-		"""
-		Returns an NSAffineTransform object for transforming layers.
-		Apply an NSAffineTransform t object like this:
-			Layer.transform_checkForSelection_doComponents_(t, False, True)
-		Access its transformation matrix like this:
-			tMatrix = t.transformStruct() # returns the 6-float tuple
-		Apply the matrix tuple like this:
-			Layer.applyTransform(tMatrix)
-			Component.applyTransform(tMatrix)
-			Path.applyTransform(tMatrix)
-		Chain multiple NSAffineTransform objects t1, t2 like this:
-			t1.appendTransform_(t2)
-		"""
-		myTransform = NSAffineTransform.transform()
-		if rotate:
-			myTransform.rotateByDegrees_(rotate)
-		if scale != 1.0:
-			myTransform.scaleBy_(scale)
-		if not (shiftX == 0.0 and shiftY == 0.0):
-			myTransform.translateXBy_yBy_(shiftX, shiftY)
-		if skew:
-			skewStruct = NSAffineTransformStruct()
-			skewStruct.m11 = 1.0
-			skewStruct.m22 = 1.0
-			skewStruct.m21 = tan(radians(skew))
-			skewTransform = NSAffineTransform.transform()
-			skewTransform.setTransformStruct_(skewStruct)
-			myTransform.appendTransform_(skegwTransform)
-		return myTransform
 
 	@objc.python_method
 	def recenterLayer(self, layer, newCenterX):
@@ -80,8 +48,7 @@ class ShowStyles(ReporterPlugin):
 		# rounding jitter
 		distance = newCenterX - centerX
 		if abs(distance) > 1.0:
-			shift = self.transform(distance)
-			layer.applyTransform(shift.transformStruct())
+			layer.applyTransform((1, 0, 0, 1, distance, 0))
 
 	@objc.python_method
 	def background(self, Layer):
@@ -139,8 +106,7 @@ class ShowStyles(ReporterPlugin):
 					if not xAlign is None:
 						interpolatedPoint = interpolatedLayer.shapes[pathIndex].nodes[nodeIndex]
 						xInterpolated = interpolatedPoint.x
-						shift = self.transform(shiftX = (xAlign - xInterpolated))
-						interpolatedLayer.transform_checkForSelection_doComponents_(shift, False, False)
+						interpolatedLayer.applyTransform((1, 0, 0, 1, xAlign - xInterpolated, 0))
 					elif Glyphs.defaults["com.mekkablue.ShowStyles.centering"]:
 						self.recenterLayer(interpolatedLayer, centerX)
 
