@@ -17,6 +17,7 @@ import objc
 from GlyphsApp import *
 from GlyphsApp.plugins import *
 from math import tan, radians
+from Foundation import NSMidX
 
 ALIGN = "★"
 
@@ -36,19 +37,15 @@ class ShowStyles(ReporterPlugin):
 		self.keyboardShortcutModifier = NSControlKeyMask | NSCommandKeyMask | NSAlternateKeyMask
 
 		# default centering setting:
-		Glyphs.registerDefault("com.mekkablue.ShowStyles.centering", 0)
-		Glyphs.registerDefault("com.mekkablue.ShowStyles.anchors", 0)
+		Glyphs.registerDefault("com.mekkablue.ShowStyles.centering", False)
+		Glyphs.registerDefault("com.mekkablue.ShowStyles.anchors", False)
 
 	@objc.python_method
-	def recenterLayer(self, layer, newCenterX):
-		centerX = layer.bounds.origin.x + layer.bounds.size.width / 2
-
-		# update if the previous and current center are off sync
-		# only act if the new difference is at least 1 unit to avoid 
-		# rounding jitter
-		distance = newCenterX - centerX
-		if abs(distance) > 1.0:
-			layer.applyTransform((1, 0, 0, 1, distance, 0))
+	def alignBezierPath(self, bezierPath, offset):
+		if abs(offset) > 1.0:
+			myTransform = NSAffineTransform.transform()
+			myTransform.translateXBy_yBy_(offset, 0)
+			bezierPath.transformUsingAffineTransform_(myTransform)
 
 	@objc.python_method
 	def background(self, Layer):
@@ -67,10 +64,14 @@ class ShowStyles(ReporterPlugin):
 			if selectedIndex < 0:
 				alphaFactor = 1.0
 
-			Instances = [(index, i) for index, i in enumerate(Font.instances) if i.active or Glyphs.defaults["com.mekkablue.ShowStyles.showDisabledStyles"]]
+			drawCentered = Glyphs.boolDefaults["com.mekkablue.ShowStyles.centering"]
+			drawAnchors = Glyphs.boolDefaults["com.mekkablue.ShowStyles.anchors"]
+			showDisabledStyles = Glyphs.boolDefaults["com.mekkablue.ShowStyles.showDisabledStyles"]
+
+			Instances = [(index, i) for index, i in enumerate(Font.instances) if i.active or showDisabledStyles]
 
 			# values for centering:
-			centerX = Layer.bounds.origin.x + Layer.bounds.size.width / 2
+			centerX = NSMidX(Layer.bounds)
 
 			# values for aligning on a node:
 			pathIndex, nodeIndex, xAlign = None, None, None
@@ -100,30 +101,36 @@ class ShowStyles(ReporterPlugin):
 				if displayOnlyParameteredInstances and (instanceColorValue is None):
 					continue
 				interpolatedLayer = self.glyphInterpolation(Glyph, thisInstance)
-				if interpolatedLayer is not None:
 
-					# draw interpolated paths + components:
-					if not xAlign is None:
-						interpolatedPoint = interpolatedLayer.shapes[pathIndex].nodes[nodeIndex]
-						xInterpolated = interpolatedPoint.x
-						interpolatedLayer.applyTransform((1, 0, 0, 1, xAlign - xInterpolated, 0))
-					elif Glyphs.defaults["com.mekkablue.ShowStyles.centering"]:
-						self.recenterLayer(interpolatedLayer, centerX)
+				if interpolatedLayer is None:
+					continue
+				
+				offset = 0
+				# draw interpolated paths + components:
+				if not xAlign is None:
+					interpolatedPoint = interpolatedLayer.shapes[pathIndex].nodes[nodeIndex]
+					offset = xAlign - interpolatedPoint.x
+				elif drawCentered:
+					newCenterX = NSMidX(interpolatedLayer.bounds)
+					offset = centerX - newCenterX
 
-					# set color:
-					color = self.colorForParameterValue(instanceColorValue, globalColorValue)
-					if index == selectedIndex:
-						alpha = min(1.0, max(0.1, color.alphaComponent() * alphaFactorSelected))
-					else:
-						alpha = min(0.9, max(0.05, color.alphaComponent() * alphaFactor))
-					color.colorWithAlphaComponent_(alpha).set()
-					interpolatedLayer.completeBezierPath.fill()
+				# set color:
+				color = self.colorForParameterValue(instanceColorValue, globalColorValue)
+				if index == selectedIndex:
+					alpha = min(1.0, max(0.1, color.alphaComponent() * alphaFactorSelected))
+				else:
+					alpha = min(0.9, max(0.05, color.alphaComponent() * alphaFactor))
+				color.colorWithAlphaComponent_(alpha).set()
+				
+				bezierPath = interpolatedLayer.completeBezierPath
+				self.alignBezierPath(bezierPath, offset)
+				bezierPath.fill()
 
-					# draw anchors:
-					if Glyphs.defaults["com.mekkablue.ShowStyles.anchors"]:
-						NSColor.colorWithRed_green_blue_alpha_(0.3, 0.1, 0.1, 0.5).set()
-						for thisAnchor in interpolatedLayer.anchors:
-							self.roundDotForPoint(thisAnchor.position, 5.0 / self.getScale()).fill()
+				# draw anchors:
+				if drawAnchors:
+					NSColor.colorWithRed_green_blue_alpha_(0.3, 0.1, 0.1, 0.5).set()
+					for thisAnchor in interpolatedLayer.anchors:
+						self.roundDotForPoint(thisAnchor.position, 5.0 / self.getScale()).fill()
 		except:
 			import traceback
 			print(traceback.format_exc())
@@ -236,14 +243,14 @@ class ShowStyles(ReporterPlugin):
 				'zh': '以中心对齐',
 			}),
 			'action': self.toggleCentering_,
-			'state': Glyphs.defaults["com.mekkablue.ShowStyles.centering"],
+			'state': Glyphs.boolDefaults["com.mekkablue.ShowStyles.centering"],
 		})
 
 		# Return list of context menu items
 		return contextMenus
 
 	def toggleCentering_(self, sender=None):
-		Glyphs.defaults["com.mekkablue.ShowStyles.centering"] = not Glyphs.defaults["com.mekkablue.ShowStyles.centering"]
+		Glyphs.boolDefaults["com.mekkablue.ShowStyles.centering"] = not Glyphs.boolDefaults["com.mekkablue.ShowStyles.centering"]
 		Glyphs.font.currentTab.forceRedraw()
 
 	@objc.python_method
