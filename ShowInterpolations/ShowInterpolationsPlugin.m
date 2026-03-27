@@ -8,6 +8,21 @@
 // Licensed under the Apache License, Version 2.0.
 
 #import "ShowInterpolationsPlugin.h"
+#import <GlyphsCore/GSGlyphViewControllerProtocol.h>
+#import <GlyphsCore/GSInterpolationFontProxy.h>
+
+// ---—-----------------------------------------------------------------------
+// Glyphs.app main-class helpers — accessed via NSClassFromString to avoid
+// a direct _OBJC_CLASS_$_Glyphs symbol reference, which the modern macOS
+// dyld no longer exports from the main executable into the flat namespace.
+// ---------------------------------------------------------------------------
+static NSString *GlyphsLocalize(NSDictionary<NSString *, NSString *> *dict) {
+    Class cls = NSClassFromString(@"Glyphs");
+    if (cls && [cls respondsToSelector:@selector(localize:)]) {
+        return [cls performSelector:@selector(localize:) withObject:dict];
+    }
+    return dict[@"en"] ?: dict.allValues.firstObject ?: @"";
+}
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -51,28 +66,8 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
     return 1;
 }
 
-- (NSString *)title {
-    // Localised menu name shown in View > Show … .
-    return [Glyphs localize:@{
-        @"en" : @"Interpolations",
-        @"de" : @"Interpolationen",
-        @"es" : @"interpolaciones",
-        @"fr" : @"interpolations",
-        @"pt" : @"interpolações",
-        @"zh" : @"💗插值",
-    }];
-}
-
-- (NSString *)keyboardShortcut {
-    // Ctrl + Cmd + Opt + S  (mirrors the ShowStyles shortcut)
-    return @"s";
-}
-
-- (NSEventModifierFlags)keyboardShortcutModifier {
-    return NSEventModifierFlagControl | NSEventModifierFlagCommand | NSEventModifierFlagOption;
-}
-
-- (void)awakeFromNib {
+- (void)loadPlugin {
+    NSLog(@"[ShowInterpolations] loadPlugin called");
     // Register user-defaults so boolForKey returns a sensible initial value.
     NSDictionary *defaults = @{
         kDefaultsCentering   : @NO,
@@ -82,9 +77,32 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
+- (NSString *)title {
+    // Localised menu name shown in View > Show … .
+    NSString *t = GlyphsLocalize(@{
+        @"en" : @"Interpolations",
+        @"de" : @"Interpolationen",
+        @"es" : @"interpolaciones",
+        @"fr" : @"interpolations",
+        @"pt" : @"interpolações",
+        @"zh" : @"💗插值",
+    });
+    NSLog(@"[ShowInterpolations] title = %@", t);
+    return t;
+}
+
+- (NSString *)keyEquivalent {
+    // Ctrl + Cmd + Opt + S  (mirrors the ShowStyles shortcut)
+    return @"s";
+}
+
+- (NSEventModifierFlags)modifierMask {
+    return NSEventModifierFlagControl | NSEventModifierFlagCommand | NSEventModifierFlagOption;
+}
+
 // MARK: - Drawing
 
-- (void)drawBackgroundForLayer:(GSLayer *)layer {
+- (void)drawBackgroundForLayer:(GSLayer *)layer options:(NSDictionary *)options {
     @try {
         if (!layer) return;
 
@@ -100,7 +118,7 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
         // When nothing is selected (selectedIndex < 0) everything is full.
         CGFloat alphaFactor         = 0.33;
         CGFloat alphaFactorSelected = 1.2;
-        NSInteger selectedIndex     = [font.currentTab selectedInstance];
+        NSInteger selectedIndex     = [(NSViewController<GSGlyphEditViewControllerProtocol> *)self.controller selectedInstance];
         if (selectedIndex < 0) {
             alphaFactor = 1.0;
         }
@@ -116,7 +134,7 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
         NSArray<GSInstance *> *allInstances  = font.instances;
         for (NSUInteger i = 0; i < allInstances.count; i++) {
             GSInstance *inst = allInstances[i];
-            if (inst.active || showDisabledStyles) {
+            if (inst.visible || showDisabledStyles) {
                 [instances addObject:@[@(i), inst]];
             }
         }
@@ -136,7 +154,7 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
             GSPath *path = (GSPath *)shape;
             for (NSUInteger ni = 0; ni < path.nodes.count; ni++) {
                 GSNode *node = path.nodes[ni];
-                if ([node.name isEqualToString:GSIAlignMarker]) {
+                if ([[node userDataForKey:@"name"] isEqualToString:GSIAlignMarker]) {
                     pathIndex   = (NSInteger)pi;
                     nodeIndex   = (NSInteger)ni;
                     xAlign      = node.position.x;
@@ -152,7 +170,7 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
         BOOL showOnlyParametered = NO;
         for (NSArray *pair in instances) {
             GSInstance *inst       = pair[1];
-            id paramValue          = inst.customParameters[kCustomParam];
+            id paramValue          = [inst customValueForKey:kCustomParam];
             if (paramValue != nil) {
                 showOnlyParametered = YES;
                 break;
@@ -160,14 +178,14 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
         }
 
         // ---- Font-wide color override ---------------------------------
-        NSString *globalColorValue = font.customParameters[kCustomParam];
+        NSString *globalColorValue = [font customValueForKey:kCustomParam];
 
         // ---- Draw each instance ---------------------------------------
         for (NSArray *pair in instances) {
             NSInteger index    = [pair[0] integerValue];
             GSInstance *inst   = pair[1];
 
-            NSString *instanceColorValue = inst.customParameters[kCustomParam];
+            NSString *instanceColorValue = [inst customValueForKey:kCustomParam];
             if (showOnlyParametered && instanceColorValue == nil) continue;
 
             GSLayer *interpolatedLayer = [self glyphInterpolation:glyph instance:inst];
@@ -201,14 +219,14 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
             [[color colorWithAlphaComponent:alpha] set];
 
             // Draw the filled outline.
-            NSBezierPath *bezierPath = interpolatedLayer.completeBezierPath;
+            NSBezierPath *bezierPath = interpolatedLayer.bezierPath;
             [self alignBezierPath:bezierPath offset:offset];
             [bezierPath fill];
 
             // Optionally draw anchors.
             if (drawAnchors) {
                 [[NSColor colorWithCalibratedRed:0.3 green:0.1 blue:0.1 alpha:0.5] set];
-                CGFloat scale = [self getScale];
+                CGFloat scale = [options[@"Scale"] doubleValue];
                 for (GSAnchor *anchor in interpolatedLayer.anchors) {
                     CGFloat dotSize = (scale > 0.0) ? (5.0 / scale) : 5.0;
                     NSBezierPath *dot = [self roundDotForPoint:anchor.position markerWidth:dotSize];
@@ -232,14 +250,14 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
         GSGlyph *interpolatedGlyph = [interpolatedFont glyphForName:glyph.name];
         if (!interpolatedGlyph) return nil;
 
-        GSLayer *interpolatedLayer = interpolatedGlyph.layers.firstObject;
+        GSLayer *interpolatedLayer = interpolatedGlyph.layers.allValues.firstObject;
         if (!interpolatedLayer) return nil;
 
         // Only return a layer that actually has outline data.
-        if (interpolatedLayer.paths.count == 0) return nil;
+        if ([(id)interpolatedLayer.paths count] == 0) return nil;
 
         // Round coordinates to grid when the font uses integer grid spacing.
-        if (interpolatedFont.gridLength == 1.0) {
+        if ([(id)interpolatedFont gridLength] == 1.0) {
             [interpolatedLayer roundCoordinates];
         }
 
@@ -290,59 +308,59 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
 
 // MARK: - Context menus
 
-- (NSArray *)conditionalContextMenus {
-    NSMutableArray *menus = [NSMutableArray array];
+- (void)addMenuItemsForEvent:(NSEvent *)theEvent toMenu:(NSMenu *)theMenu {
     NSUserDefaults *ud    = [NSUserDefaults standardUserDefaults];
 
-    GSLayer *layer = [Glyphs font].selectedLayers.firstObject;
-    NSArray *selection = layer.selection;
+    GSLayer *layer = [(NSViewController<GSGlyphViewControllerProtocol> *)self.controller selectedLayers].firstObject;
+    NSOrderedSet<GSSelectableElement *> *selection = layer.selection;
 
     if (selection.count == 1 && [selection.firstObject isKindOfClass:[GSNode class]]) {
         GSNode *node = (GSNode *)selection.firstObject;
-        if (![node.name isEqualToString:GSIAlignMarker]) {
-            // Offer to set the alignment node.
-            [menus addObject:@{
-                @"name" : [Glyphs localize:@{
-                    @"en" : @"Align interpolations at selected node",
-                    @"de" : @"Interpolationen an ausgewähltem Punkt ausrichten",
-                    @"es" : @"Alinear las interpolaciones al nodo seleccionado",
-                    @"fr" : @"Aligner les interpolations au point sélectionné",
-                    @"pt" : @"Alinhar interpolações no nó selecionado",
-                    @"zh" : @"以所选点为基点对齐",
-                }],
-                @"action" : NSStringFromSelector(@selector(alignAtNode:)),
-            }];
+        NSString *itemTitle;
+        SEL itemAction;
+        if (![[node userDataForKey:@"name"] isEqualToString:GSIAlignMarker]) {
+            itemTitle  = GlyphsLocalize(@{
+                @"en" : @"Align interpolations at selected node",
+                @"de" : @"Interpolationen an ausgewähltem Punkt ausrichten",
+                @"es" : @"Alinear las interpolaciones al nodo seleccionado",
+                @"fr" : @"Aligner les interpolations au point sélectionné",
+                @"pt" : @"Alinhar interpolações no nó selecionado",
+                @"zh" : @"以所选点为基点对齐",
+            });
+            itemAction = @selector(alignAtNode:);
         } else {
-            // Offer to remove the alignment node.
-            [menus addObject:@{
-                @"name" : [Glyphs localize:@{
-                    @"en" : @"Do not align interpolations at selected node",
-                    @"de" : @"Interpolationen nicht an ausgewähltem Punkt ausrichten",
-                    @"es" : @"No alinear las interpolaciones al nodo seleccionado",
-                    @"fr" : @"Ne pas aligner les interpolations au point sélectionné",
-                    @"pt" : @"Não alinhar interpolações no nó selecionado",
-                    @"zh" : @"不以所选点为基点对齐",
-                }],
-                @"action" : NSStringFromSelector(@selector(doNotAlignAtNode:)),
-            }];
+            itemTitle  = GlyphsLocalize(@{
+                @"en" : @"Do not align interpolations at selected node",
+                @"de" : @"Interpolationen nicht an ausgewähltem Punkt ausrichten",
+                @"es" : @"No alinear las interpolaciones al nodo seleccionado",
+                @"fr" : @"Ne pas aligner les interpolations au point sélectionné",
+                @"pt" : @"Não alinhar interpolações no nó selecionado",
+                @"zh" : @"不以所选点为基点对齐",
+            });
+            itemAction = @selector(doNotAlignAtNode:);
         }
+        NSMenuItem *alignItem = [[NSMenuItem alloc] initWithTitle:itemTitle
+                                                           action:itemAction
+                                                    keyEquivalent:@""];
+        alignItem.target = self;
+        [theMenu addItem:alignItem];
     }
 
     // Center-toggle item (carries a checkmark state).
-    [menus addObject:@{
-        @"name" : [Glyphs localize:@{
-            @"en" : @"Center interpolations",
-            @"de" : @"Interpolationen zentrieren",
-            @"es" : @"Centrar las interpolaciones",
-            @"fr" : @"Centrer les interpolations",
-            @"pt" : @"Centralizar as interpolações",
-            @"zh" : @"以中心对齐",
-        }],
-        @"action" : NSStringFromSelector(@selector(toggleCentering:)),
-        @"state"  : @([ud boolForKey:kDefaultsCentering]),
-    }];
-
-    return [menus copy];
+    NSString *centerTitle = GlyphsLocalize(@{
+        @"en" : @"Center interpolations",
+        @"de" : @"Interpolationen zentrieren",
+        @"es" : @"Centrar las interpolaciones",
+        @"fr" : @"Centrer les interpolations",
+        @"pt" : @"Centralizar as interpolações",
+        @"zh" : @"以中心对齐",
+    });
+    NSMenuItem *centerItem = [[NSMenuItem alloc] initWithTitle:centerTitle
+                                                        action:@selector(toggleCentering:)
+                                                 keyEquivalent:@""];
+    centerItem.target = self;
+    centerItem.state  = [ud boolForKey:kDefaultsCentering] ? NSControlStateValueOn : NSControlStateValueOff;
+    [theMenu addItem:centerItem];
 }
 
 // MARK: - Context-menu actions
@@ -350,28 +368,28 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
 - (void)toggleCentering:(nullable id)sender {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     [ud setBool:![ud boolForKey:kDefaultsCentering] forKey:kDefaultsCentering];
-    [[Glyphs font].currentTab forceRedraw];
+    [(id)self.controller forceRedraw];
 }
 
 - (void)alignAtNode:(nullable id)sender {
-    GSLayer *layer       = [Glyphs font].selectedLayers.firstObject;
+    GSLayer *layer        = [(NSViewController<GSGlyphViewControllerProtocol> *)self.controller selectedLayers].firstObject;
     GSNode  *selectedNode = (GSNode *)layer.selection.firstObject;
     [self resetNodeAlignment:layer];
     [self setNodeName:selectedNode name:GSIAlignMarker otherMaster:NO];
 }
 
 - (void)doNotAlignAtNode:(nullable id)sender {
-    GSLayer *layer = [Glyphs font].selectedLayers.firstObject;
+    GSLayer *layer = [(NSViewController<GSGlyphViewControllerProtocol> *)self.controller selectedLayers].firstObject;
     [self resetNodeAlignment:layer];
 }
 
 // MARK: - Private node helpers
 
 - (void)resetNodeAlignment:(GSLayer *)layer {
-    for (GSPath *path in layer.paths) {
+    for (GSPath *path in (id)layer.paths) {
         for (GSNode *node in path.nodes) {
-            if ([node.name isEqualToString:GSIAlignMarker]) {
-                node.name = nil;
+            if ([[node userDataForKey:@"name"] isEqualToString:GSIAlignMarker]) {
+                [node removeUserDataForKey:@"name"];
             }
         }
     }
@@ -389,7 +407,7 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
         [self resetNodeAlignment:layer];
 
         // Mark this node.
-        node.name = nodeName;
+        [node setUserData:nodeName forKey:@"name"];
 
         if (otherMaster) return; // Prevent infinite recursion.
 
@@ -413,8 +431,8 @@ static NSString * const kCustomParam         = @"ShowInterpolations";
         // Apply to every other master's corresponding layer.
         GSGlyph *glyph = (GSGlyph *)layer.parent;
         GSFont  *font  = (GSFont *)glyph.parent;
-        for (GSFontMaster *master in font.masters) {
-            if (master == font.selectedFontMaster) continue;
+        for (GSFontMaster *master in font.fontMasters) {
+            if (glyph.layers[master.id] == layer) continue;
             GSLayer *masterLayer = glyph.layers[master.id];
             if (!masterLayer
                     || foundPathIndex >= (NSInteger)masterLayer.shapes.count) continue;

@@ -8,7 +8,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 #import <Cocoa/Cocoa.h>
-#import <GlyphsCore/GlyphsReporterPlugin.h>
+#import <GlyphsCore/GlyphsReporterProtocol.h>
 #import <GlyphsCore/GSFont.h>
 #import <GlyphsCore/GSFontMaster.h>
 #import <GlyphsCore/GSInstance.h>
@@ -17,22 +17,25 @@
 #import <GlyphsCore/GSPath.h>
 #import <GlyphsCore/GSNode.h>
 #import <GlyphsCore/GSAnchor.h>
-#import <GlyphsCore/GSTab.h>
-#import <GlyphsCore/Glyphs.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /// Unicode star used as a node name to mark the alignment anchor point.
 extern NSString * const GSIAlignMarker;
 
-@interface ShowInterpolationsPlugin : GlyphsReporterPlugin
+@interface ShowInterpolationsPlugin : NSObject <GlyphsReporter>
+
+/// Set by Glyphs — the edit view controller that owns the current draw pass.
+@property (weak) NSViewController<GSGlyphEditViewControllerProtocol> *controller;
 
 // MARK: - Drawing
 
 /// Main drawing entry point called by Glyphs for every edit-view redraw.
 /// Iterates active instances, interpolates each one, and fills the resulting
 /// bezier paths behind the current layer's outlines.
-- (void)drawBackgroundForLayer:(GSLayer *)layer;
+/// @param options  Dictionary from Glyphs; use @c options[@"Scale"] for the
+///                 current zoom factor when sizing screen-constant elements.
+- (void)drawBackgroundForLayer:(GSLayer *)layer options:(NSDictionary *)options;
 
 // MARK: - Helpers
 
@@ -52,6 +55,17 @@ extern NSString * const GSIAlignMarker;
 
 /// Returns a filled circle path of diameter @p markerWidth centred on @p point.
 - (NSBezierPath *)roundDotForPoint:(NSPoint)point markerWidth:(CGFloat)markerWidth;
+
+// MARK: - Protocol requirements
+
+/// Keyboard shortcut character (GlyphsReporter protocol).
+- (NSString *)keyEquivalent;
+
+/// Keyboard shortcut modifier mask (GlyphsReporter protocol).
+- (NSEventModifierFlags)modifierMask;
+
+/// Adds plugin-specific items to the edit-view context menu (GlyphsReporter protocol).
+- (void)addMenuItemsForEvent:(NSEvent *)theEvent toMenu:(NSMenu *)theMenu;
 
 // MARK: - Context-menu actions
 

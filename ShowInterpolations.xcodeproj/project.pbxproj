@@ -28,7 +28,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AA0200000000000000000000 /* ShowInterpolations root */ = {
+		AA0200000000000000000000 = {
 			isa = PBXGroup;
 			children = (
 				AA0400000000000000000000 /* ShowInterpolations */,
@@ -231,15 +231,17 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Applications/Glyphs 3.app/Contents/Frameworks",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/GlyphsFrameworks";
 				INFOPLIST_FILE = ShowInterpolations/Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Application Support/Glyphs 3/Plugins";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_LDFLAGS = "-undefined dynamic_lookup";
+				OTHER_LDFLAGS = (
+					"-undefined",
+					dynamic_lookup,
+					"-framework",
+					GlyphsCore,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mekkablue.ShowInterpolations;
 				PRODUCT_NAME = ShowInterpolations;
 				SKIP_INSTALL = YES;
@@ -252,15 +254,17 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Applications/Glyphs 3.app/Contents/Frameworks",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/GlyphsFrameworks";
 				INFOPLIST_FILE = ShowInterpolations/Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Application Support/Glyphs 3/Plugins";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_LDFLAGS = "-undefined dynamic_lookup";
+				OTHER_LDFLAGS = (
+					"-undefined",
+					dynamic_lookup,
+					"-framework",
+					GlyphsCore,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mekkablue.ShowInterpolations;
 				PRODUCT_NAME = ShowInterpolations;
 				SKIP_INSTALL = YES;
@@ -290,7 +294,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = AA0100000000000000000000 /* Project object */;
 }
