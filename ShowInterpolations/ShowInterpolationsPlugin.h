@@ -20,9 +20,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// Unicode star used as a node name to mark the alignment anchor point.
-extern NSString * const GSIAlignMarker;
-
 @interface ShowInterpolationsPlugin : NSObject <GlyphsReporter>
 
 /// Set by Glyphs — the edit view controller that owns the current draw pass.
@@ -50,12 +47,6 @@ extern NSString * const GSIAlignMarker;
 - (NSColor *)colorForParameterValue:(nullable NSString *)instanceValue
                            fallback:(nullable NSString *)fontValue;
 
-/// Translates @p bezierPath horizontally by @p offset (no-op when |offset| ≤ 1).
-- (void)alignBezierPath:(NSBezierPath *)bezierPath offset:(CGFloat)offset;
-
-/// Returns a filled circle path of diameter @p markerWidth centred on @p point.
-- (NSBezierPath *)roundDotForPoint:(NSPoint)point markerWidth:(CGFloat)markerWidth;
-
 // MARK: - Protocol requirements
 
 /// Keyboard shortcut character (GlyphsReporter protocol).
@@ -63,21 +54,6 @@ extern NSString * const GSIAlignMarker;
 
 /// Keyboard shortcut modifier mask (GlyphsReporter protocol).
 - (NSEventModifierFlags)modifierMask;
-
-/// Adds plugin-specific items to the edit-view context menu (GlyphsReporter protocol).
-- (void)addMenuItemsForEvent:(NSEvent *)theEvent toMenu:(NSMenu *)theMenu;
-
-// MARK: - Context-menu actions
-
-/// Toggles the "center interpolations" preference and forces a redraw.
-- (void)toggleCentering:(nullable id)sender;
-
-/// Marks the currently selected node with the alignment star on all masters.
-- (void)alignAtNode:(nullable id)sender;
-
-/// Removes all alignment stars from the current layer (and matching nodes on
-/// other masters).
-- (void)doNotAlignAtNode:(nullable id)sender;
 
 @end
 
