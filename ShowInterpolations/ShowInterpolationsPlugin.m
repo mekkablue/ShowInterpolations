@@ -12,19 +12,6 @@
 #import <GlyphsCore/GSInterpolationFontProxy.h>
 
 // ---------------------------------------------------------------------------
-// Glyphs.app main-class helpers — accessed via NSClassFromString to avoid
-// a direct _OBJC_CLASS_$_Glyphs symbol reference, which the modern macOS
-// dyld no longer exports from the main executable into the flat namespace.
-// ---------------------------------------------------------------------------
-static NSString *GlyphsLocalize(NSDictionary<NSString *, NSString *> *dict) {
-    Class cls = NSClassFromString(@"Glyphs");
-    if (cls && [cls respondsToSelector:@selector(localize:)]) {
-        return [cls performSelector:@selector(localize:) withObject:dict];
-    }
-    return dict[@"en"] ?: dict.allValues.firstObject ?: @"";
-}
-
-// ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
@@ -54,16 +41,12 @@ static NSString * const kCustomParam          = @"ShowInterpolations";
 }
 
 - (NSString *)title {
-    // Localised menu name shown in View > Show … .
-    NSString *t = GlyphsLocalize(@{
-        @"en" : @"Interpolations",
-        @"de" : @"Interpolationen",
-        @"es" : @"interpolaciones",
-        @"fr" : @"interpolations",
-        @"pt" : @"interpolações",
-        @"zh" : @"💗插值",
-    });
+    // Localized menu name shown in View > Show … .
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *t = NSLocalizedStringFromTableInBundle(@"Interpolations", nil, bundle, @"Plugin name");
+#if DEBUG
     NSLog(@"[ShowInterpolations] title = %@", t);
+#endif
     return t;
 }
 
