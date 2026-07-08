@@ -7,10 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		56971F552FFEF38C005DC1DD /* GlyphsApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56971F532FFEF38C005DC1DD /* GlyphsApp.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		56971F562FFEF38C005DC1DD /* GlyphsCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56971F542FFEF38C005DC1DD /* GlyphsCore.framework */; };
 		AA0B00000000000000000000 /* ShowInterpolationsPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = AA0800000000000000000000 /* ShowInterpolationsPlugin.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		56971F532FFEF38C005DC1DD /* GlyphsApp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GlyphsApp.framework; path = "/Applications/Glyphs 4.app/Contents/Frameworks/GlyphsApp.framework"; sourceTree = "<absolute>"; };
+		56971F542FFEF38C005DC1DD /* GlyphsCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GlyphsCore.framework; path = "/Applications/Glyphs 4.app/Contents/Frameworks/GlyphsCore.framework"; sourceTree = "<absolute>"; };
 		AA0600000000000000000000 /* ShowInterpolations.glyphsReporter */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShowInterpolations.glyphsReporter; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA0700000000000000000000 /* ShowInterpolationsPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShowInterpolationsPlugin.h; sourceTree = "<group>"; };
 		AA0800000000000000000000 /* ShowInterpolationsPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShowInterpolationsPlugin.m; sourceTree = "<group>"; };
@@ -22,16 +26,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56971F552FFEF38C005DC1DD /* GlyphsApp.framework in Frameworks */,
+				56971F562FFEF38C005DC1DD /* GlyphsCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		56971F522FFEF38C005DC1DD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				56971F532FFEF38C005DC1DD /* GlyphsApp.framework */,
+				56971F542FFEF38C005DC1DD /* GlyphsCore.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		AA0200000000000000000000 = {
 			isa = PBXGroup;
 			children = (
 				AA0400000000000000000000 /* ShowInterpolations */,
+				56971F522FFEF38C005DC1DD /* Frameworks */,
 				AA0300000000000000000000 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -229,22 +245,16 @@
 		AA1200000000000000000000 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/GlyphsFrameworks";
+				DEPLOYMENT_LOCATION = YES;
+				DSTROOT = "$(USER_LIBRARY_DIR)/Application Support/Glyphs 4/Plugins";
+				FRAMEWORK_SEARCH_PATHS = "\"/Applications/Glyphs 4.app/Contents/Frameworks/\"";
 				INFOPLIST_FILE = ShowInterpolations/Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Application Support/Glyphs 3/Plugins";
+				INSTALL_PATH = /;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_LDFLAGS = (
-					"-undefined",
-					dynamic_lookup,
-					"-framework",
-					GlyphsCore,
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mekkablue.ShowInterpolations;
 				PRODUCT_NAME = ShowInterpolations;
-				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = glyphsReporter;
 			};
 			name = Debug;
@@ -252,22 +262,14 @@
 		AA1300000000000000000000 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/GlyphsFrameworks";
+				FRAMEWORK_SEARCH_PATHS = "\"/Applications/Glyphs 4.app/Contents/Frameworks/\"";
 				INFOPLIST_FILE = ShowInterpolations/Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Application Support/Glyphs 3/Plugins";
+				INSTALL_PATH = /;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				OTHER_LDFLAGS = (
-					"-undefined",
-					dynamic_lookup,
-					"-framework",
-					GlyphsCore,
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mekkablue.ShowInterpolations;
 				PRODUCT_NAME = ShowInterpolations;
-				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = glyphsReporter;
 			};
 			name = Release;
