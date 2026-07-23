@@ -14,12 +14,12 @@ from __future__ import division, print_function, unicode_literals
 ###########################################################################################################
 
 import objc
-from GlyphsApp import *
-from GlyphsApp.plugins import *
-from math import tan, radians
-from Foundation import NSMidX
+from GlyphsApp import Glyphs, GSPath, GSNode
+from GlyphsApp.plugins import ReporterPlugin
+from Cocoa import NSAffineTransform, NSColor, NSBezierPath, NSRect, NSMidX, NSControlKeyMask, NSCommandKeyMask, NSAlternateKeyMask
 
 ALIGN = "★"
+
 
 class ShowStyles(ReporterPlugin):
 
@@ -104,10 +104,10 @@ class ShowStyles(ReporterPlugin):
 
 				if interpolatedLayer is None:
 					continue
-				
+
 				offset = 0
 				# draw interpolated paths + components:
-				if not xAlign is None:
+				if xAlign is not None:
 					interpolatedPoint = interpolatedLayer.shapes[pathIndex].nodes[nodeIndex]
 					offset = xAlign - interpolatedPoint.x
 				elif drawCentered:
@@ -121,7 +121,7 @@ class ShowStyles(ReporterPlugin):
 				else:
 					alpha = min(0.9, max(0.05, color.alphaComponent() * alphaFactor))
 				color.colorWithAlphaComponent_(alpha).set()
-				
+
 				bezierPath = interpolatedLayer.completeBezierPath
 				self.alignBezierPath(bezierPath, offset)
 				bezierPath.fill()
@@ -175,10 +175,10 @@ class ShowStyles(ReporterPlugin):
 		"""
 		Turns '0.3;0.4;0.9' into RGB values and returns an NSColor object.
 		"""
-		try:
-			# default color:
-			RGBA = [0.4, 0.0, 0.3, 0.15]
 
+		# default color:
+		RGBA = [0.4, 0.0, 0.3, 0.15]
+		try:
 			# first overwrite with font - wide color,
 			# then again with instance color:
 			for parameterString in (fallbackParameterString, instanceParameterString):
@@ -192,15 +192,14 @@ class ShowStyles(ReporterPlugin):
 						if thisValue > 1.0:
 							thisValue %= 1.0
 						RGBA[i] = thisValue
-					except Exception as e:
+					except:
 						pass
 						# self.logToConsole("Could not convert '%s' (from '%s') to a float. Keeping default." % (thisValueString, parameterString))
-
-			# return the color:
-			thisColor = NSColor.colorWithCalibratedRed_green_blue_alpha_(RGBA[0], RGBA[1], RGBA[2], RGBA[3])
-			return thisColor
 		except Exception as e:
 			self.logToConsole("colorForParameterValue: %s" % str(e))
+		# return the color:
+		thisColor = NSColor.colorWithCalibratedRed_green_blue_alpha_(RGBA[0], RGBA[1], RGBA[2], RGBA[3])
+		return thisColor
 
 	@objc.python_method
 	def conditionalContextMenus(self):
@@ -292,7 +291,7 @@ class ShowStyles(ReporterPlugin):
 				id = thisMaster.id
 				masterNode = thisGlyph.layers[id].shapes[pathIndex].nodes[nodeIndex]
 				self.setNodeName(masterNode, newNote, otherMaster=True)
-		except Exception as e:
+		except:
 			import traceback
 			print(traceback.format_exc())
 
